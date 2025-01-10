@@ -4,7 +4,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 interface PieceMoves {
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position);
+    Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position);
+
+    default boolean canMove(ChessBoard board, int row, int col, ChessGame.TeamColor color){
+        if (row>0 && row<9 && col>0 && col<9){
+            ChessPiece theSpot = board.getPiece(new ChessPosition(row,col));
+            if(theSpot == null){return true;}
+            ChessGame.TeamColor enemyColor = theSpot.getTeamColor();
+            switch(color){
+                case WHITE:
+                    if(enemyColor == ChessGame.TeamColor.BLACK){return true;}
+                    break;
+                case BLACK:
+                    if(enemyColor == ChessGame.TeamColor.WHITE){return true;}
+                    break;
+            }
+        }
+        return false;
+    }
 }
 
 class PawnMoves implements PieceMoves {
@@ -17,7 +34,8 @@ class PawnMoves implements PieceMoves {
      * Returns false if:
      * location is out of bounds or there is a piece of the same color there
      */
-    public static boolean canCapture(ChessBoard board, int row, int col, ChessGame.TeamColor color){
+    @Override
+    public boolean canMove(ChessBoard board, int row, int col, ChessGame.TeamColor color){
         if (row>0 && row<9 && col>0 && col<9){
             ChessPiece theSpot = board.getPiece(new ChessPosition(row,col));
             if(theSpot == null){return false;}
@@ -52,9 +70,9 @@ class PawnMoves implements PieceMoves {
                      if(board.getPiece(new ChessPosition(position.getRow()+1,position.getColumn())) == null){moves.add(new ChessPosition(position.getRow()+1,position.getColumn()));}
                  }
                  //checking capture conditions (diagonal)
-                 if(PawnMoves.canCapture(board, position.getRow()+1, position.getColumn()-1, ChessGame.TeamColor.WHITE)) {
+                 if(canMove(board, position.getRow()+1, position.getColumn()-1, ChessGame.TeamColor.WHITE)) {
                      moves.add(new ChessPosition(position.getRow()+1, position.getColumn()-1));}
-                 if(PawnMoves.canCapture(board, position.getRow()+1, position.getColumn()+1, ChessGame.TeamColor.WHITE)) {
+                 if(canMove(board, position.getRow()+1, position.getColumn()+1, ChessGame.TeamColor.WHITE)) {
                      moves.add(new ChessPosition(position.getRow()+1, position.getColumn()+1));}
                 break;
              case BLACK:
@@ -69,9 +87,9 @@ class PawnMoves implements PieceMoves {
                      if(board.getPiece(new ChessPosition(position.getRow()-1,position.getColumn())) == null){moves.add(new ChessPosition(position.getRow()-1,position.getColumn()));}
                  }
                  //checking capture conditions (diagonal)
-                 if(PawnMoves.canCapture(board, position.getRow()-1, position.getColumn()-1, ChessGame.TeamColor.BLACK)) {
+                 if(canMove(board, position.getRow()-1, position.getColumn()-1, ChessGame.TeamColor.BLACK)) {
                      moves.add(new ChessPosition(position.getRow()-1, position.getColumn()-1));}
-                 if(PawnMoves.canCapture(board, position.getRow()-1, position.getColumn()+1, ChessGame.TeamColor.BLACK)) {
+                 if(canMove(board, position.getRow()-1, position.getColumn()+1, ChessGame.TeamColor.BLACK)) {
                      moves.add(new ChessPosition(position.getRow()-1, position.getColumn()+1));}
                  break;
          }
@@ -90,24 +108,6 @@ class PawnMoves implements PieceMoves {
 }
 
 class KingMoves implements PieceMoves {
-
-    public static boolean canMove(ChessBoard board, int row, int col, ChessGame.TeamColor color){
-        if (row>0 && row<9 && col>0 && col<9){
-            ChessPiece theSpot = board.getPiece(new ChessPosition(row,col));
-            if(theSpot == null){return true;}
-            ChessGame.TeamColor enemyColor = theSpot.getTeamColor();
-            switch(color){
-                case WHITE:
-                    if(enemyColor == ChessGame.TeamColor.BLACK){return true;}
-                    break;
-                case BLACK:
-                    if(enemyColor == ChessGame.TeamColor.WHITE){return true;}
-                    break;
-            }
-        }
-        return false;
-    }
-
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
         ArrayList<ChessMove> theMoves = new ArrayList<>();
         ArrayList<ChessPosition> moves = new ArrayList<>();
@@ -127,22 +127,7 @@ class KingMoves implements PieceMoves {
 }
 
 class KnightMoves implements PieceMoves {
-    public static boolean canMove(ChessBoard board, int row, int col, ChessGame.TeamColor color){
-        if (row>0 && row<9 && col>0 && col<9){
-            ChessPiece theSpot = board.getPiece(new ChessPosition(row,col));
-            if(theSpot == null){return true;}
-            ChessGame.TeamColor enemyColor = theSpot.getTeamColor();
-            switch(color){
-                case WHITE:
-                    if(enemyColor == ChessGame.TeamColor.BLACK){return true;}
-                    break;
-                case BLACK:
-                    if(enemyColor == ChessGame.TeamColor.WHITE){return true;}
-                    break;
-            }
-        }
-        return false;
-    }
+
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
         ArrayList<ChessMove> theMoves = new ArrayList<>();
@@ -155,12 +140,12 @@ class KnightMoves implements PieceMoves {
         for(int row:rows){
             if(row%2==0){
                 for(int col:cols1){
-                    if(canMove(board,row,col,color)){moves.add(new ChessPosition(row,col));}
+                    if(canMove(board,position.getRow()+row,position.getColumn()+col,color)){moves.add(new ChessPosition(position.getRow()+row,position.getColumn()+col));}
                 }
             }
             else{
                 for(int col:cols2){
-                    if(canMove(board,row,col,color)){moves.add(new ChessPosition(row,col));}
+                    if(canMove(board,position.getRow()+row,position.getColumn()+col,color)){moves.add(new ChessPosition(position.getRow()+row,position.getColumn()+col));}
                 }
             }
         }
