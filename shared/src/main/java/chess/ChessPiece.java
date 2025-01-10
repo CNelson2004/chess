@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -10,7 +12,12 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
+    private final PieceType pieceType;
+    private final ChessGame.TeamColor teamColor;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        teamColor = pieceColor;
+        pieceType = type;
     }
 
     /**
@@ -28,16 +35,12 @@ public class ChessPiece {
     /**
      * @return Which team this chess piece belongs to
      */
-    public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
-    }
+    public ChessGame.TeamColor getTeamColor() { return teamColor; }
 
     /**
      * @return which type of chess piece this piece is
      */
-    public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
-    }
+    public PieceType getPieceType() { return pieceType; }
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -47,6 +50,48 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(myPosition);
+        switch(piece.getPieceType()){
+            case PAWN:
+                PieceMoves pawnMovement = new PawnMoves();
+                return pawnMovement.pieceMoves(board,myPosition);
+            case KING:
+                PieceMoves kingMovement = new KingMoves();
+                return kingMovement.pieceMoves(board,myPosition);
+            case KNIGHT:
+                PieceMoves knightMovement = new KnightMoves();
+                return knightMovement.pieceMoves(board,myPosition);
+            case ROOK:
+                PieceMoves rookMovement = new RookMoves();
+                return rookMovement.pieceMoves(board,myPosition);
+            case BISHOP:
+                PieceMoves bishopMovement = new BishopMoves();
+                return bishopMovement.pieceMoves(board,myPosition);
+            case QUEEN:
+                PieceMoves queenMovement = new QueenMoves();
+                return queenMovement.pieceMoves(board,myPosition);
+            default:
+                throw new RuntimeException("Unknown piece type: " + piece.getPieceType());
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ChessPiece that)) {
+            return false;
+        }
+        return pieceType == that.pieceType && teamColor == that.teamColor;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceType, teamColor);
+    }
+
+    @Override
+    public String toString() {
+        return "Type:" + pieceType + ",Color:" + teamColor;
     }
 }
+
+
