@@ -265,6 +265,13 @@ class BishopMoves implements PieceMoves {
 
 class QueenMoves implements PieceMoves {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
-        throw new RuntimeException("Not implemented");
+        PieceMoves rookMovement = new RookMoves();
+        Collection<ChessMove> rookMoves = rookMovement.pieceMoves(board,position);
+        PieceMoves bishopMovement = new BishopMoves();
+        Collection<ChessMove> bishopMoves = bishopMovement.pieceMoves(board,position);
+        ArrayList<ChessMove> queenMoves = new ArrayList<>();
+        queenMoves.addAll(rookMoves);
+        queenMoves.addAll(bishopMoves);
+        return queenMoves;
     }
 }
