@@ -158,7 +158,51 @@ class KnightMoves implements PieceMoves {
 
 class RookMoves implements PieceMoves {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessMove> theMoves = new ArrayList<>();
+        ArrayList<ChessPosition> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
+        int row = position.getRow();
+        int tempRow = position.getRow();
+        int col = position.getColumn();
+        int tempCol = position.getColumn();
+        while(tempRow<9){
+            tempRow++;
+            if(canMove(board,tempRow,col,color)){
+                moves.add(new ChessPosition(tempRow,col));
+                if(board.getPiece(new ChessPosition(tempRow,col)) != null){break;}
+            }
+            else{break;}
+        }
+        tempRow = position.getRow();
+        while(tempRow>0){
+            tempRow--;
+            if(canMove(board,tempRow,col,color)){
+                moves.add(new ChessPosition(tempRow,col));
+                if(board.getPiece(new ChessPosition(tempRow,col)) != null){break;}
+            }
+            else{break;}
+        }
+        while(tempCol<9){
+            tempCol++;
+            if(canMove(board,row,tempCol,color)){
+                moves.add(new ChessPosition(row,tempCol));
+                if(board.getPiece(new ChessPosition(row,tempCol)) != null){break;}
+            }
+            else{break;}
+        }
+        tempCol = position.getColumn();
+        while(tempCol>0){
+            tempCol--;
+            if(canMove(board,row,tempCol,color)){
+                moves.add(new ChessPosition(row,tempCol));
+                if(board.getPiece(new ChessPosition(row,tempCol)) != null){break;}
+            }
+            else{break;}
+        }
+        for (ChessPosition pos : moves) {
+            theMoves.add(new ChessMove(position,pos,null));
+        }
+        return theMoves;
     }
 }
 
