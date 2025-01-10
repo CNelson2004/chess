@@ -37,8 +37,7 @@ class PawnMoves implements PieceMoves {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
          ArrayList<ChessMove> theMoves = new ArrayList<>();
          ArrayList<ChessPosition> moves = new ArrayList<>();
-         ChessPiece piece = board.getPiece(position);
-         ChessGame.TeamColor color = piece.getTeamColor();
+         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
 
           switch(color){
              case WHITE:
@@ -91,14 +90,84 @@ class PawnMoves implements PieceMoves {
 }
 
 class KingMoves implements PieceMoves {
+
+    public static boolean canMove(ChessBoard board, int row, int col, ChessGame.TeamColor color){
+        if (row>0 && row<9 && col>0 && col<9){
+            ChessPiece theSpot = board.getPiece(new ChessPosition(row,col));
+            if(theSpot == null){return true;}
+            ChessGame.TeamColor enemyColor = theSpot.getTeamColor();
+            switch(color){
+                case WHITE:
+                    if(enemyColor == ChessGame.TeamColor.BLACK){return true;}
+                    break;
+                case BLACK:
+                    if(enemyColor == ChessGame.TeamColor.WHITE){return true;}
+                    break;
+            }
+        }
+        return false;
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessMove> theMoves = new ArrayList<>();
+        ArrayList<ChessPosition> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
+        for(int k=-1;k<2;k++){
+            for(int m=-1;m<2;m++){
+                if(canMove(board,position.getRow()+k,position.getColumn()+m,color)){
+                    moves.add(new ChessPosition(position.getRow()+k,position.getColumn()+m));
+                }
+            }
+        }
+        for (ChessPosition pos : moves) {
+            theMoves.add(new ChessMove(position,pos,null));
+        }
+        return theMoves;
     }
 }
 
 class KnightMoves implements PieceMoves {
+    public static boolean canMove(ChessBoard board, int row, int col, ChessGame.TeamColor color){
+        if (row>0 && row<9 && col>0 && col<9){
+            ChessPiece theSpot = board.getPiece(new ChessPosition(row,col));
+            if(theSpot == null){return true;}
+            ChessGame.TeamColor enemyColor = theSpot.getTeamColor();
+            switch(color){
+                case WHITE:
+                    if(enemyColor == ChessGame.TeamColor.BLACK){return true;}
+                    break;
+                case BLACK:
+                    if(enemyColor == ChessGame.TeamColor.WHITE){return true;}
+                    break;
+            }
+        }
+        return false;
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessMove> theMoves = new ArrayList<>();
+        ArrayList<ChessPosition> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
+        //(-2,-1)(-2,1)(-1,-2)(-1,2)(1,-2)(1,2)(2,-1)(2,1)
+        int[] rows = {-2,-1,1,2};
+        int[] cols1 = {-1,1};
+        int[] cols2 = {-2,2};
+        for(int row:rows){
+            if(row%2==0){
+                for(int col:cols1){
+                    if(canMove(board,row,col,color)){moves.add(new ChessPosition(row,col));}
+                }
+            }
+            else{
+                for(int col:cols2){
+                    if(canMove(board,row,col,color)){moves.add(new ChessPosition(row,col));}
+                }
+            }
+        }
+        for (ChessPosition pos : moves) {
+            theMoves.add(new ChessMove(position,pos,null));
+        }
+        return theMoves;
     }
 }
 
