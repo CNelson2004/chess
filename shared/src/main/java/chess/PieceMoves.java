@@ -208,7 +208,58 @@ class RookMoves implements PieceMoves {
 
 class BishopMoves implements PieceMoves {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position){
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessMove> theMoves = new ArrayList<>();
+        ArrayList<ChessPosition> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
+        int tempRow = position.getRow();
+        int tempCol = position.getColumn();
+
+        while(tempRow<9 && tempCol>0){
+            tempRow++;
+            tempCol--;
+            if(canMove(board,tempRow,tempCol,color)){
+                moves.add(new ChessPosition(tempRow,tempCol));
+                if(board.getPiece(new ChessPosition(tempRow,tempCol)) != null){break;}
+            }
+            else{break;}
+        }
+        tempRow = position.getRow();
+        tempCol = position.getColumn();
+        while(tempRow<9 && tempCol<9){
+            tempRow++;
+            tempCol++;
+            if(canMove(board,tempRow,tempCol,color)){
+                moves.add(new ChessPosition(tempRow,tempCol));
+                if(board.getPiece(new ChessPosition(tempRow,tempCol)) != null){break;}
+            }
+            else{break;}
+        }
+        tempRow = position.getRow();
+        tempCol = position.getColumn();
+        while(tempRow>0 && tempCol>0){
+            tempRow--;
+            tempCol--;
+            if(canMove(board,tempRow,tempCol,color)){
+                moves.add(new ChessPosition(tempRow,tempCol));
+                if(board.getPiece(new ChessPosition(tempRow,tempCol)) != null){break;}
+            }
+            else{break;}
+        }
+        tempRow = position.getRow();
+        tempCol = position.getColumn();
+        while(tempRow>0 && tempCol<9){
+            tempRow--;
+            tempCol++;
+            if(canMove(board,tempRow,tempCol,color)){
+                moves.add(new ChessPosition(tempRow,tempCol));
+                if(board.getPiece(new ChessPosition(tempRow,tempCol)) != null){break;}
+            }
+            else{break;}
+        }
+        for (ChessPosition pos : moves) {
+            theMoves.add(new ChessMove(position,pos,null));
+        }
+        return theMoves;
     }
 }
 
