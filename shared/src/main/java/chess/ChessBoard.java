@@ -13,8 +13,19 @@ public class ChessBoard {
 
     private final ChessPiece[][] board = new ChessPiece[8][8];
 
-    public ChessBoard() {
+    public ChessBoard() {}
+
+    public static ChessBoard copyBoard(ChessBoard theBoard) {
+        ChessBoard copy = new ChessBoard();
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                copy.addPiece(new ChessPosition(i,j),theBoard.getPiece(new ChessPosition(i,j)));
+            }
+        }
+        return copy;
     }
+
+    public ChessPiece[][] getBoard() {return board;}
 
     /**
      * Adds a chess piece to the chessboard
@@ -23,6 +34,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) { board[position.getRow()-1][position.getColumn()-1] = piece; }
+
+    public void removePiece(ChessPosition position) {board[position.getRow()-1][position.getColumn()-1] = null;}
 
     /**
      * Gets a chess piece on the chessboard
