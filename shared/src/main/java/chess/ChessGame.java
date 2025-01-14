@@ -11,11 +11,12 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    ChessGame.TeamColor teamTurn = TeamColor.WHITE;
+    ChessGame.TeamColor teamTurn;
     ChessBoard board = new ChessBoard();
 
     public ChessGame() {
         board.resetBoard();
+        teamTurn = TeamColor.WHITE;
     }
 
     /**
@@ -28,10 +29,10 @@ public class ChessGame {
     /**
      * Set's which teams turn it is
      *
-     * @param team the team whose turn it is
+     * @param teamColor the team whose turn it is
      */
-    public void setTeamTurn(TeamColor team) {
-        teamTurn = team;
+    public void setTeamTurn(TeamColor teamColor) {
+        teamTurn = teamColor;
     }
 
     /**
@@ -77,9 +78,30 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         //If move is valid, do it, if not throw exception
-        //Move the piece on the board to the new end position and remove the old one
-
-        throw new RuntimeException("Not implemented");
+        //checking if a piece actually exists
+        if(board.getPiece(move.getStartPosition())==null){throw new InvalidMoveException("No piece exists.");}
+        //checking if the team turn is correct
+        TeamColor moveColor = board.getPiece(move.getStartPosition()).getTeamColor();
+        if(teamTurn != moveColor){throw new InvalidMoveException("Not your team's turn.");}
+        //getting info and moving stuff
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        Collection<ChessPosition> validPositions = new ArrayList<>();
+        for(ChessMove validMove: validMoves){validPositions.add(validMove.getEndPosition());}
+        if(validPositions.contains(move.getEndPosition())){
+            board.addPiece(move.getEndPosition(),board.getPiece(move.getStartPosition()));
+            board.removePiece(move.getStartPosition());
+            //changing turn
+            switch(moveColor){
+                case WHITE:
+                    setTeamTurn(TeamColor.BLACK);
+                    break;
+                case BLACK:
+                    setTeamTurn(TeamColor.WHITE);
+                    break;
+            }
+            //Dealing with pawn promotion
+        }
+        else{throw new InvalidMoveException("Not a valid move.");}
     }
 
     /**
