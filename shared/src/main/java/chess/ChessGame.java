@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -10,15 +11,17 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    ChessGame.TeamColor teamTurn = TeamColor.WHITE;
+    ChessBoard board;
 
+    public ChessGame() {
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return teamTurn;
     }
 
     /**
@@ -27,7 +30,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        teamTurn = team;
     }
 
     /**
@@ -46,6 +49,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        //This takes into account moves that leave king exposed? Thus not valid.
         throw new RuntimeException("Not implemented");
     }
 
@@ -56,7 +60,96 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        //If move is valid, do it, if not throw exception
         throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Returns the location of all the pieces of a specific team on the board
+     *
+     * @param teamColor The team pieces we are looking for
+     * @return all positions of thep pieces
+     */
+    public Collection<ChessPosition> getAllPieces(TeamColor teamColor) {
+        ArrayList<ChessPosition> pieces = new ArrayList<>();
+        for (int i=1;i<9;i++){
+            for(int j=1;j<9;j++){
+                try {
+                    if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor) {
+                        pieces.add(new ChessPosition(i, j));
+                    }
+                }
+                catch(Exception e){continue;}
+            }
+        }
+        return pieces;
+    }
+
+    /**
+     * Finds the location of the king of a certain team on the board
+     *
+     * @param teamColor which team King we are looking for
+     * @return Returns king's location on the board
+     */
+    public ChessPosition findKing(TeamColor teamColor) {
+        for (int i=1;i<9;i++){
+            for(int j=1;j<9;j++){
+                try {
+                    if (board.getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING) {
+                        if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor) {
+                            return new ChessPosition(i, j);
+                        }
+                    }
+                }
+                catch (Exception e) {continue;}
+                }
+            }
+        throw new RuntimeException("King not found");
+    }
+
+    public Collection<Collection<ChessMove>> getPieceMoves(TeamColor teamColor) {
+        Collection<ChessPosition> pieces = getAllPieces(teamColor);
+        Collection<ChessMove> moves;
+        Collection<Collection<ChessMove>> allMoves = new ArrayList<>();
+        for(ChessPosition piecePosition: pieces){
+            ChessPiece thePiece = new ChessPiece(teamColor,board.getPiece(piecePosition).getPieceType());
+            moves = thePiece.pieceMoves(board, piecePosition);
+            allMoves.add(moves);
+        }
+        return allMoves;
+    }
+
+    /**
+     * @param teamColor team color we are checking
+     * @return all the end positons of all the pieces of that team color
+     */
+    public Collection<Collection<ChessPosition>> getPieceEndPositions(TeamColor teamColor) {
+        ArrayList<ChessPosition> endPositions = new ArrayList<>();
+        Collection<Collection<ChessPosition>> allEndPositions = new ArrayList<>();
+        Collection<Collection<ChessMove>> allMoves = getPieceMoves(teamColor);
+        for(Collection<ChessMove> moves: allMoves){
+            for(ChessMove move: moves){endPositions.add(move.getEndPosition());}
+            allEndPositions.add(endPositions);
+        }
+        return allEndPositions;
+    }
+
+    /**
+     * Checks if the king was at the given position if he would be in check
+     *
+     * @param position the position we are checking if it is in check (theoretical king location)
+     * @param teamColor the color of the potential king
+     * @return true if the position is in check
+     */
+    public boolean isPotentiallyInCheck(ChessPosition position, TeamColor teamColor) {
+        //getting enemy end positions
+        Collection<Collection<ChessPosition>> allEndPositions = getPieceEndPositions(TeamColor.WHITE);
+        if(teamColor == TeamColor.WHITE){allEndPositions = getPieceEndPositions(TeamColor.BLACK);}
+        //checking them
+        for(Collection<ChessPosition> piecePositions: allEndPositions){
+            if(piecePositions.contains(position)){return true;}
+        }
+        return false;
     }
 
     /**
@@ -66,7 +159,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //If the opponent can make a move to capture the king, then he is in check
+        return isPotentiallyInCheck(findKing(teamColor),teamColor);
     }
 
     /**
@@ -76,6 +170,24 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        //No matter what move is made the king will be in check
+        //Confirm king is currently in check
+        if (!isInCheck(teamColor)) {return false;}
+        //Get king information
+        ChessPosition kingPosition = findKing(teamColor);
+        ChessPiece king = board.getPiece(kingPosition);
+        Collection<ChessMove> kingMoves = king.pieceMoves(board,kingPosition);
+        ArrayList<ChessPosition> kingEndPositions = new ArrayList<>();
+        for(ChessMove move: kingMoves){kingEndPositions.add(move.getEndPosition());}
+        //case 1: king can move out of check
+        for(ChessPosition pos: kingEndPositions){
+            if(!isPotentiallyInCheck(pos, teamColor)){return false;}
+        }
+        //case 2: attacking piece putting king in check is captured
+
+        //case 3: attacking piece is blocked
+
+
         throw new RuntimeException("Not implemented");
     }
 
@@ -87,7 +199,17 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //If no one can move, then it is stalemate
+        Collection<ChessPosition> pieces = getAllPieces(teamColor);
+        Collection<ChessMove> moves;
+        for(ChessPosition piecePosition: pieces){
+            ChessPiece thePiece = new ChessPiece(teamColor,board.getPiece(piecePosition).getPieceType());
+            moves = thePiece.pieceMoves(board, piecePosition);
+            if (!moves.isEmpty()){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -96,7 +218,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -105,6 +227,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
