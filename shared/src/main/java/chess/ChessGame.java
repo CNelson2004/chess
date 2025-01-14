@@ -12,9 +12,10 @@ import java.util.Collection;
 public class ChessGame {
 
     ChessGame.TeamColor teamTurn = TeamColor.WHITE;
-    ChessBoard board;
+    ChessBoard board = new ChessBoard();
 
     public ChessGame() {
+        board.resetBoard();
     }
 
     /**
@@ -50,8 +51,19 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         //This takes into account moves that leave king exposed? Thus not valid.
+        //Getting all possible moves
+        ChessPiece thePiece = board.getPiece(startPosition);
+        Collection<ChessMove> moves = thePiece.pieceMoves(board,startPosition);
+        //make the theoretical move with a hypothetical board and check if the king would be in check
+        ChessBoard tempBoard = board;
+        for(ChessMove move: moves){
+            ChessPosition endPosition = move.getEndPosition();
+
+        }
+
         throw new RuntimeException("Not implemented");
     }
+
 
     /**
      * Makes a move in a chess game
@@ -61,6 +73,8 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         //If move is valid, do it, if not throw exception
+        //Move the piece on the board to the new end position and remove the old one
+
         throw new RuntimeException("Not implemented");
     }
 
@@ -141,7 +155,7 @@ public class ChessGame {
      * @param teamColor the color of the potential king
      * @return true if the position is in check
      */
-    public boolean isPotentiallyInCheck(ChessPosition position, TeamColor teamColor) {
+    public boolean isInCheck(ChessPosition position, TeamColor teamColor) {
         //getting enemy end positions
         Collection<Collection<ChessPosition>> allEndPositions = getPieceEndPositions(TeamColor.WHITE);
         if(teamColor == TeamColor.WHITE){allEndPositions = getPieceEndPositions(TeamColor.BLACK);}
@@ -160,7 +174,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         //If the opponent can make a move to capture the king, then he is in check
-        return isPotentiallyInCheck(findKing(teamColor),teamColor);
+        return isInCheck(findKing(teamColor),teamColor);
     }
 
     /**
@@ -170,25 +184,16 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        //No matter what move is made the king will be in check
-        //Confirm king is currently in check
-        if (!isInCheck(teamColor)) {return false;}
-        //Get king information
-        ChessPosition kingPosition = findKing(teamColor);
-        ChessPiece king = board.getPiece(kingPosition);
-        Collection<ChessMove> kingMoves = king.pieceMoves(board,kingPosition);
-        ArrayList<ChessPosition> kingEndPositions = new ArrayList<>();
-        for(ChessMove move: kingMoves){kingEndPositions.add(move.getEndPosition());}
-        //case 1: king can move out of check
-        for(ChessPosition pos: kingEndPositions){
-            if(!isPotentiallyInCheck(pos, teamColor)){return false;}
-        }
-        //case 2: attacking piece putting king in check is captured
-
-        //case 3: attacking piece is blocked
-
-
-        throw new RuntimeException("Not implemented");
+        //returns true for if no piece has any valid moves and king in check
+        /**
+         * if(!isinCheck(teamColor)){return false;}
+         Collection<ChessPosition> pieces = getAllPieces(teamColor);
+         for(ChessPosition piecePosition: pieces){
+         if(!validMoves(piecePosition).isEmpty()){return false;}
+         }
+         return true;
+        **/
+        throw new RuntimeException("isInCheckmate Not implemented");
     }
 
     /**
@@ -199,17 +204,16 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        //If no one can move, then it is stalemate
+        //returns true if no valid moves and king is not in check
+        /**
+         * if(isinCheck(teamColor)){return false;}
         Collection<ChessPosition> pieces = getAllPieces(teamColor);
-        Collection<ChessMove> moves;
         for(ChessPosition piecePosition: pieces){
-            ChessPiece thePiece = new ChessPiece(teamColor,board.getPiece(piecePosition).getPieceType());
-            moves = thePiece.pieceMoves(board, piecePosition);
-            if (!moves.isEmpty()){
-                return false;
-            }
+            if(!validMoves(piecePosition).isEmpty()){return false;}
         }
         return true;
+         **/
+        throw new RuntimeException("isInStalemate Not implemented");
     }
 
     /**
