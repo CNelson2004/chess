@@ -41,11 +41,11 @@ class PawnMoves implements PieceMoves {
             if(theSpot == null){return false;}
             ChessGame.TeamColor enemyColor = theSpot.getTeamColor();
             switch(color){
-                case WHITE:
-                    if(enemyColor == ChessGame.TeamColor.BLACK){return true;}
-                    break;
                 case BLACK:
                     if(enemyColor == ChessGame.TeamColor.WHITE){return true;}
+                    break;
+                case WHITE:
+                    if(enemyColor == ChessGame.TeamColor.BLACK){return true;}
                     break;
             }
         }
@@ -67,13 +67,21 @@ class PawnMoves implements PieceMoves {
                          }
                      }
                  else{
-                     if(board.getPiece(new ChessPosition(position.getRow()+1,position.getColumn())) == null){moves.add(new ChessPosition(position.getRow()+1,position.getColumn()));}
-                 }
+                     if(position.getRow()<8) {
+                         if (board.getPiece(new ChessPosition(position.getRow() + 1, position.getColumn())) == null) {
+                             moves.add(new ChessPosition(position.getRow() + 1, position.getColumn()));
+                         }
+                     }
+                     }
                  //checking capture conditions (diagonal)
-                 if(canMove(board, position.getRow()+1, position.getColumn()-1, ChessGame.TeamColor.WHITE)) {
-                     moves.add(new ChessPosition(position.getRow()+1, position.getColumn()-1));}
-                 if(canMove(board, position.getRow()+1, position.getColumn()+1, ChessGame.TeamColor.WHITE)) {
-                     moves.add(new ChessPosition(position.getRow()+1, position.getColumn()+1));}
+                 if(position.getRow()<8) {
+                     if (canMove(board, position.getRow() + 1, position.getColumn() - 1, ChessGame.TeamColor.WHITE)) {
+                         moves.add(new ChessPosition(position.getRow() + 1, position.getColumn() - 1));
+                     }
+                     if (canMove(board, position.getRow() + 1, position.getColumn() + 1, ChessGame.TeamColor.WHITE)) {
+                         moves.add(new ChessPosition(position.getRow() + 1, position.getColumn() + 1));
+                     }
+                 }
                 break;
              case BLACK:
                  //checking normal conditions
