@@ -100,6 +100,9 @@ public class ChessGame {
                     break;
             }
             //Dealing with pawn promotion
+            if((board.getPiece(move.getEndPosition()).getPieceType()==ChessPiece.PieceType.PAWN)&&((move.getEndPosition().getRow()==8)||(move.getEndPosition().getRow()==1))){
+                board.addPiece(move.getEndPosition(),new ChessPiece(moveColor,move.getPromotionPiece()));
+            }
         }
         else{throw new InvalidMoveException("Not a valid move.");}
     }
