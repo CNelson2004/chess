@@ -11,7 +11,6 @@ interface PieceMoves {
         if (row>0 && row<9 && col>0 && col<9){
             ChessPiece theSpot = board.getPiece(new ChessPosition(row,col));
             if(theSpot == null){return true;}
-            ChessGame.TeamColor enemyColor = theSpot.getTeamColor();
             if(theSpot.getTeamColor() != color){return true;}
         }
         return false;
