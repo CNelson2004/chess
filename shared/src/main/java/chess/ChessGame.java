@@ -100,7 +100,8 @@ public class ChessGame {
                     break;
             }
             //Dealing with pawn promotion
-            if((board.getPiece(move.getEndPosition()).getPieceType()==ChessPiece.PieceType.PAWN)&&((move.getEndPosition().getRow()==8)||(move.getEndPosition().getRow()==1))){
+            if((board.getPiece(move.getEndPosition()).getPieceType()==ChessPiece.PieceType.PAWN)&&
+                    ((move.getEndPosition().getRow()==8)||(move.getEndPosition().getRow()==1))){
                 board.addPiece(move.getEndPosition(),new ChessPiece(moveColor,move.getPromotionPiece()));
             }
         }
@@ -165,10 +166,9 @@ public class ChessGame {
         for (int i=1;i<9;i++){
             for(int j=1;j<9;j++){
                 try {
-                    if (board.getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING) {
-                        if (board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor) {
+                    if ((board.getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING)
+                            &&(board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor)) {
                             return new ChessPosition(i, j);
-                        }
                     }
                 }
                 catch (Exception e) {continue;}

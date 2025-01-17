@@ -3,6 +3,13 @@ package chess;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static chess.ChessPiece.PieceType.ROOK;
+import static chess.ChessPiece.PieceType.KNIGHT;
+import static chess.ChessPiece.PieceType.BISHOP;
+import static chess.ChessPiece.PieceType.QUEEN;
+import static chess.ChessPiece.PieceType.KING;
+import static chess.ChessPiece.PieceType.PAWN;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -51,15 +58,15 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        ChessPiece.PieceType[] lineup = {ChessPiece.PieceType.ROOK,ChessPiece.PieceType.KNIGHT,ChessPiece.PieceType.BISHOP,ChessPiece.PieceType.QUEEN,ChessPiece.PieceType.KING,ChessPiece.PieceType.BISHOP,ChessPiece.PieceType.KNIGHT,ChessPiece.PieceType.ROOK};
+        ChessPiece.PieceType[] lineup = {ROOK,KNIGHT,BISHOP,QUEEN,KING,BISHOP,KNIGHT, ROOK};
         for(int i=1;i<=8;i++){
             addPiece(new ChessPosition(1,i),new ChessPiece(ChessGame.TeamColor.WHITE,lineup[i-1]));
         }
         for(int i=1;i<=8;i++){
-            addPiece(new ChessPosition(2,i),new ChessPiece(ChessGame.TeamColor.WHITE,ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(2,i),new ChessPiece(ChessGame.TeamColor.WHITE,PAWN));
         }
         for(int i=1;i<=8;i++){
-            addPiece(new ChessPosition(7,i),new ChessPiece(ChessGame.TeamColor.BLACK,ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7,i),new ChessPiece(ChessGame.TeamColor.BLACK,PAWN));
         }
         for(int i=1;i<=8;i++){
             addPiece(new ChessPosition(8,i),new ChessPiece(ChessGame.TeamColor.BLACK,lineup[i-1]));

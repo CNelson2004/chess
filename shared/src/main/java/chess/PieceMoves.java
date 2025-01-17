@@ -144,7 +144,9 @@ class KnightMoves implements PieceMoves {
             int[] currentCols = cols2;
             if(row%2==0){currentCols = cols1;}
             for(int col:currentCols){
-                if(canMove(board,position.getRow()+row,position.getColumn()+col,color)){moves.add(new ChessPosition(position.getRow()+row,position.getColumn()+col));}
+                if(canMove(board,position.getRow()+row,position.getColumn()+col,color)){
+                    moves.add(new ChessPosition(position.getRow()+row,position.getColumn()+col));
+                }
             }
         }
         return createMoveList(position,moves);
