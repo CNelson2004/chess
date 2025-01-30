@@ -1,12 +1,13 @@
 package service;
+import dataaccess.*;
 
 record ClearResult(String message){}
 
 public class ClearService {
-    ClearResult clear(){
-        //Call clear on all the Daos, AuthDao.clear(), GameDao.clear(), UserDao.clear()
-        //Everything is deleted from database
-        //Return ClearResult
-        throw new RuntimeException("Not implemented.");
+    public ClearResult clear(UserDao uDao, AuthDao aDao, GameDao gDao) {
+        aDao.clear();
+        gDao.clear();
+        uDao.clear();
+        return new ClearResult(null);
     }
 }
