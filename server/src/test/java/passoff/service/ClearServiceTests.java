@@ -16,7 +16,7 @@ public class ClearServiceTests {
 //                throw new InvalidArgumentException();
 //            });
     @Test
-        public void testClear() {
+        public void testClear() throws DataAccessException {
             //Populating it with stuff
             UserDao user = new MemoryUserDao();
             GameDao game = new MemoryGameDao();
@@ -27,9 +27,13 @@ public class ClearServiceTests {
             user.createUser("two","two2","two2@gmail.com");
             game.createGame(one,"test1","WHITE");
             game.createGame(two,"test2","BLACK");
-            auth.createAuth(one);
-            auth.createAuth(two);
-            //Clearing the stuff
+            try {
+                auth.createAuth(one);
+                auth.createAuth(two);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+        //Clearing the stuff
             ClearService clearService = new ClearService();
             clearService.clear(user,auth,game);
             assertTrue(user.getAllUsers().isEmpty());

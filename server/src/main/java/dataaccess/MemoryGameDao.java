@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class MemoryGameDao implements GameDao{
-    private static final ArrayList<GameData> games = new ArrayList<>();
+    private final ArrayList<GameData> games = new ArrayList<>();
 
     public void clear(){
         getAllGames().clear();

@@ -33,11 +33,12 @@ public class UserService {
 
     boolean verifyAuth(String authToken, MemoryAuthDao aDao){
         if(authToken == null) return false;
+        if(aDao == null) return false;
         AuthData aData = aDao.getAuth(authToken);
         return aData != null;
     }
 
-    public RegisterResult register(RegisterRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) {
+    public RegisterResult register(RegisterRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) throws DataAccessException {
         //verifying input
         if(!(verifyInput(r.username(),"username"))){
             return new RegisterResult(null,null,"Username is null");}
@@ -60,7 +61,7 @@ public class UserService {
         return new RegisterResult(r.username(),token.authToken(),"Success");
     }
 
-    LoginResult login(LoginRequest r, MemoryUserDao uDao, MemoryAuthDao aDao){
+    public LoginResult login(LoginRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) throws DataAccessException {
         //Verifying input
         if(!(verifyInput(r.username(),"username"))){
             return new LoginResult(null,null,"Username is null");}
@@ -73,7 +74,7 @@ public class UserService {
         //Checking the password
         UserData user = uDao.getUser(r.username());
         if (user==null){
-            return  new LoginResult(null,null,"User with that username doesn't exist");}
+            return  new LoginResult(null,null,"Username doesn't exist");}
         if (!user.password().equals(r.password())){
             return  new LoginResult(null,null,"Incorrect password");}
         //Creating an authToken for the user (automatically added to database)
@@ -81,10 +82,10 @@ public class UserService {
         //returning LoginResult
         return new LoginResult(r.username(),token.authToken(),"Success");
     }
-    LogoutResult logout(LogoutRequest r, MemoryAuthDao aDao){
+    public LogoutResult logout(LogoutRequest r, MemoryAuthDao aDao) throws DataAccessException {
         //Verify authToken
-        if(!verifyAuth(r.authToken(),aDao)){return new LogoutResult("Bad authentication token");}
         if(!(verifyDao(aDao))){return new LogoutResult("AuthDao is null");}
+        if(!verifyAuth(r.authToken(),aDao)){return new LogoutResult("Bad authentication token");}
         //Deleting the authData object
         AuthData auth = aDao.getAuth(r.authToken());
         aDao.deleteAuth(auth);

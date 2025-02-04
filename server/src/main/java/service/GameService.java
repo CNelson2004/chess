@@ -9,7 +9,7 @@ import Results.ListResult;
 
 
 public class GameService {
-    CreateResult create(CreateRequest r){
+    public CreateResult create(CreateRequest r){
         //Verify input
         //Validate authToken [getAuth() must not return null]
         //Check gameName isn't already taken [getGame(gameName) must return null] (optional)
@@ -19,7 +19,7 @@ public class GameService {
         //(Don't automatically join game upon creation)
         throw new RuntimeException("Not implemented.");
     }
-    JoinResult join(JoinRequest r){
+    public JoinResult join(JoinRequest r){
         //Verify input
         //Validate authToken [getAuth() must not return null]
         //Get game based upon GameID [getGame(gameID)] (also make sure it exists)
@@ -30,7 +30,7 @@ public class GameService {
         //Return JoinResult
         throw new RuntimeException("Not implemented.");
     }
-    ListResult list(ListRequest r){
+    public ListResult list(ListRequest r){
         //Verify input
         //Validate authToken [getAuth() must not return null]
         //Get all the games [getAllGames()]
