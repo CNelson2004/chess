@@ -1,16 +1,12 @@
 package service;
 
-import model.GameData;
-import java.util.Collection;
+import Requests.CreateRequest;
+import Requests.JoinRequest;
+import Requests.ListRequest;
+import Results.CreateResult;
+import Results.JoinResult;
+import Results.ListResult;
 
-record CreateRequest(String gameName, String authToken){}
-record CreateResult(int gameID,String message){}
-record JoinRequest(String playerColor, int gameID, String authToken){}
-record JoinResult(String message){}
-record ListRequest(String authToken){}
-//List result contains (if successful): { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
-record ListResult(Collection<GameData> allGames, String message){}
-//
 
 public class GameService {
     CreateResult create(CreateRequest r){

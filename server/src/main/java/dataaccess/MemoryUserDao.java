@@ -22,9 +22,9 @@ public class MemoryUserDao implements UserDao{
         return user;
     }
 
-    public UserData getUser(UserData user){
+    public UserData getUser(String username){
         for(UserData current: users){
-            if(current.name().equals(user.name())){
+            if(current.name().equals(username)){
                 return current;
             }
         }

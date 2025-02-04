@@ -1,7 +1,6 @@
 package service;
+import Results.ClearResult;
 import dataaccess.*;
-
-record ClearResult(String message){}
 
 public class ClearService {
     public ClearResult clear(UserDao uDao, AuthDao aDao, GameDao gDao) {

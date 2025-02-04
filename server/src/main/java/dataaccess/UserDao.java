@@ -9,7 +9,7 @@ import java.util.Collection;
 public interface UserDao {
     void clear();
     UserData createUser(String username, String password, String email);
-    UserData getUser(UserData user);
+    UserData getUser(String username);
     void deleteUser(UserData user);
     Collection<UserData> getAllUsers();
     //updateUser?

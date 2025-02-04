@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface AuthDao {
     void clear();
     AuthData createAuth(UserData user);
-    AuthData getAuth(AuthData auth);
+    AuthData getAuth(String authToken);
     void deleteAuth(AuthData auth);
     Collection<AuthData> getAllAuths();
 }

@@ -1,39 +1,94 @@
 package service;
 
-record RegisterRequest(String username, String password, String email){}
-record RegisterResult(String username, String authToken, String message){}
-record LoginRequest(String username, String password){}
-record LoginResult(String username, String authToken, String message){}
-record LogoutRequest(String authToken){}
-record LogoutResult (String message){}
+import Requests.LoginRequest;
+import Requests.LogoutRequest;
+import Requests.RegisterRequest;
+import Results.LoginResult;
+import Results.LogoutResult;
+import Results.RegisterResult;
+import dataaccess.*;
+import model.AuthData;
+import model.UserData;
 
 public class UserService {
-    RegisterResult register(RegisterRequest r) {
-        //1.Verify input
-        //[1.5. Validate the passed in authToken if needed and see what user is connected to it]
-        //2. Check username isn't already taken: getUser(username) should return null
-        //3. Create new User model object: User u = new UserData(...);
-        //4. Insert new user into the database: UserDao.createUser(u);
-        //5. Login the user, (create new AuthToken model object and insert it into the database)
-        //6. Create RegisterResult and return it
-        throw new RuntimeException("Not implemented.");
+    boolean verifyInput(String item, String type){
+        if(item == null) return false;
+        switch(type){
+            case "username", "password":
+                return true;
+            case "email":
+                return item.contains("@")&&item.contains(".com");
+            default:
+                throw new IllegalArgumentException("type not recognized");
+        }
     }
 
-    LoginResult login(LoginRequest r){
-        //Verify input
-        //Retrieve user from dataaccess/database w/ username [getUser(username)]
-        //Check given password against UserData password
-        //Create new AuthToken [createAuth()]
-        //[Dataaccess: Insert Authtoken into the database- addAuth(authData)]
-        //return LoginResult
-        throw new RuntimeException("Not implemented.");
+    boolean verifyDao(MemoryUserDao uDao){
+        return uDao != null;
     }
-    LogoutResult logout(LogoutRequest r){
-        //Verify input
-        //Verify authToken [getAuth(authToken)]
-        //Get username associated w/ authToken?
-        //Delete authData object [deleteAuth()]
-        //Return LogoutResult
-        throw new RuntimeException("Not implemented.");
+
+    boolean verifyDao(MemoryAuthDao aDao){
+        return aDao != null;
+    }
+
+    boolean verifyAuth(String authToken, MemoryAuthDao aDao){
+        if(authToken == null) return false;
+        AuthData aData = aDao.getAuth(authToken);
+        return aData != null;
+    }
+
+    public RegisterResult register(RegisterRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) {
+        //verifying input
+        if(!(verifyInput(r.username(),"username"))){
+            return new RegisterResult(null,null,"Username is null");}
+        if(!(verifyInput(r.password(),"password"))){
+            return new RegisterResult(null,null,"Password is null");}
+        if(!(verifyInput(r.email(),"email"))){
+            return new RegisterResult(null,null,"Email is not valid");}
+        if(!(verifyDao(uDao))){
+            return new RegisterResult(null,null,"UserDao is null");}
+        if(!(verifyDao(aDao))){
+            return new RegisterResult(null,null, "AuthDao is null");}
+        //Checking if username is taken
+        if(uDao.getUser(r.username()) != null){
+            return new RegisterResult(null,null,"Username is already taken");}
+        //Creating a new User model object (User automatically added to database)
+        UserData user = uDao.createUser(r.username(),r.password(),r.email());
+        //Login the user (create new AuthToken model object and insert it into the database)
+        AuthData token = aDao.createAuth(user);
+        //Returning RegisterResult
+        return new RegisterResult(r.username(),token.authToken(),"Success");
+    }
+
+    LoginResult login(LoginRequest r, MemoryUserDao uDao, MemoryAuthDao aDao){
+        //Verifying input
+        if(!(verifyInput(r.username(),"username"))){
+            return new LoginResult(null,null,"Username is null");}
+        if(!(verifyInput(r.username(),"password"))){
+            return new LoginResult(null,null,"Password is null");}
+        if(!(verifyDao(uDao))){
+            return new LoginResult(null,null,"UserDao is null");}
+        if(!(verifyDao(aDao))){
+            return new LoginResult(null,null, "AuthDao is null");}
+        //Checking the password
+        UserData user = uDao.getUser(r.username());
+        if (user==null){
+            return  new LoginResult(null,null,"User with that username doesn't exist");}
+        if (!user.password().equals(r.password())){
+            return  new LoginResult(null,null,"Incorrect password");}
+        //Creating an authToken for the user (automatically added to database)
+        AuthData token = aDao.createAuth(user);
+        //returning LoginResult
+        return new LoginResult(r.username(),token.authToken(),"Success");
+    }
+    LogoutResult logout(LogoutRequest r, MemoryAuthDao aDao){
+        //Verify authToken
+        if(!verifyAuth(r.authToken(),aDao)){return new LogoutResult("Bad authentication token");}
+        if(!(verifyDao(aDao))){return new LogoutResult("AuthDao is null");}
+        //Deleting the authData object
+        AuthData auth = aDao.getAuth(r.authToken());
+        aDao.deleteAuth(auth);
+        //Returning LogoutResult
+        return new LogoutResult("Success");
     }
 }
