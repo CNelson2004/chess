@@ -10,7 +10,7 @@ public interface UserDao {
     void clear();
     UserData createUser(String username, String password, String email);
     UserData getUser(String username);
-    void deleteUser(UserData user);
+    void deleteUser(UserData user) throws DataAccessException;
     Collection<UserData> getAllUsers();
     //updateUser?
 }

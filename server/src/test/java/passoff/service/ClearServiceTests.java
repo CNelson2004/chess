@@ -25,8 +25,8 @@ public class ClearServiceTests {
             UserData two = new UserData("two","two@gmail.com","two2");
             user.createUser("one","one1","one@gmail.com");
             user.createUser("two","two2","two2@gmail.com");
-            game.createGame(one,"test1","WHITE");
-            game.createGame(two,"test2","BLACK");
+            game.createGame("test1");
+            game.createGame("test2");
             try {
                 auth.createAuth(one);
                 auth.createAuth(two);

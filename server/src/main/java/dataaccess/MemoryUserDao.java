@@ -32,8 +32,8 @@ public class MemoryUserDao implements UserDao{
         //Throw nullError saying that token does not exist in database
     }
 
-    public void deleteUser(UserData user){
-        //Check that auth exists first and throw error if it does not
+    public void deleteUser(UserData user) throws DataAccessException {
+        if(user==null){throw new DataAccessException("UserData is null");}
         users.removeIf(current -> current.name().equals(user.name()));
         //^For-each loop w/ if statement inside
     }
