@@ -65,9 +65,9 @@ public class GameService {
         //Check that requested color isn't taken using Game you got
         switch(r.playerColor()){
             case "WHITE":
-                if(game.whiteUsername()!=null){return new JoinResult("That color is already taken.");}
+                if(game.whiteUsername()!=null){return new JoinResult("That color is already taken");}
             case "BLACK":
-                if(game.blackUsername()!=null){return new JoinResult("That color is already taken.");}
+                if(game.blackUsername()!=null){return new JoinResult("That color is already taken");}
         }
         //Get username by getting Authdata object with authToken [getAuth(authToken)]
         AuthData auth = aDao.getAuth(r.authToken());
