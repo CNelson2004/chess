@@ -40,19 +40,18 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) throws DataAccessException {
         //verifying input
-        if(!(verifyInput(r.username(),"username"))){
-            return new RegisterResult(null,null,"Username is null");}
-        if(!(verifyInput(r.password(),"password"))){
-            return new RegisterResult(null,null,"Password is null");}
-        if(!(verifyInput(r.email(),"email"))){
-            return new RegisterResult(null,null,"Email is not valid");}
-        if(!(verifyDao(uDao))){
-            return new RegisterResult(null,null,"UserDao is null");}
-        if(!(verifyDao(aDao))){
-            return new RegisterResult(null,null, "AuthDao is null");}
+        if(!(verifyInput(r.username(),"username"))){throw new InputException("Error: bad request");}
+            //return new RegisterResult(null,null,"Username is null");}
+        if(!(verifyInput(r.password(),"password"))){throw new InputException("Error: bad request");}
+            //return new RegisterResult(null,null,"Password is null");}
+        if(!(verifyInput(r.email(),"email"))){throw new InputException("Error: bad request");}
+            //return new RegisterResult(null,null,"Email is not valid");}
+        if(!(verifyDao(uDao))){throw new DaoException("Error: Database is null");}
+            //return new RegisterResult(null,null,"UserDao is null");}
+        if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
+            //return new RegisterResult(null,null, "AuthDao is null");}
         //Checking if username is taken
-        if(uDao.getUser(r.username()) != null){
-            return new RegisterResult(null,null,"Username is already taken");}
+        if(uDao.getUser(r.username()) != null){throw new DuplicateException("Error: already taken");}
         //Creating a new User model object (User automatically added to database)
         UserData user = uDao.createUser(r.username(),r.password(),r.email());
         //Login the user (create new AuthToken model object and insert it into the database)
@@ -61,22 +60,17 @@ public class UserService {
         return new RegisterResult(r.username(),token.authToken(),"Success");
     }
 
+
     public LoginResult login(LoginRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) throws DataAccessException {
         //Verifying input
-        if(!(verifyInput(r.username(),"username"))){
-            return new LoginResult(null,null,"Username is null");}
-        if(!(verifyInput(r.username(),"password"))){
-            return new LoginResult(null,null,"Password is null");}
-        if(!(verifyDao(uDao))){
-            return new LoginResult(null,null,"UserDao is null");}
-        if(!(verifyDao(aDao))){
-            return new LoginResult(null,null, "AuthDao is null");}
+        if(!(verifyInput(r.username(),"username"))){throw new InputException("Error: bad request");}
+        if(!(verifyInput(r.username(),"password"))){throw new InputException("Error: bad request");}
+        if(!(verifyDao(uDao))){throw new DaoException("Error: Database is null");}
+        if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
         //Checking the password
         UserData user = uDao.getUser(r.username());
-        if (user==null){
-            return  new LoginResult(null,null,"Username doesn't exist");}
-        if (!user.password().equals(r.password())){
-            return  new LoginResult(null,null,"Incorrect password");}
+        if (user==null){throw new InputException("Error: bad request");}
+        if (!user.password().equals(r.password())){throw new AuthorizationException("Error: unauthorized");}
         //Creating an authToken for the user (automatically added to database)
         AuthData token = aDao.createAuth(user);
         //returning LoginResult
@@ -84,8 +78,8 @@ public class UserService {
     }
     public LogoutResult logout(LogoutRequest r, MemoryAuthDao aDao) throws DataAccessException {
         //Verify authToken
-        if(!(verifyDao(aDao))){return new LogoutResult("AuthDao is null");}
-        if(!verifyAuth(r.authToken(),aDao)){return new LogoutResult("Bad authentication token");}
+        if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
+        if(!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}
         //Deleting the authData object
         AuthData auth = aDao.getAuth(r.authToken());
         aDao.deleteAuth(auth);

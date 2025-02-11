@@ -2,9 +2,12 @@ package passoff.service;
 
 import dataaccess.*;
 import model.*;
+import org.junit.jupiter.api.Assertions;
 import service.ClearService;
 
 import org.junit.jupiter.api.Test;
+import service.DaoException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearServiceTests {
@@ -16,7 +19,29 @@ public class ClearServiceTests {
 //                throw new InvalidArgumentException();
 //            });
     @Test
-        public void testClear() throws DataAccessException {
+    public void testClearPass() throws DataAccessException {
+        //Populating it with stuff
+        UserDao user = new MemoryUserDao();
+        GameDao game = new MemoryGameDao();
+        AuthDao auth = new MemoryAuthDao();
+        UserData one = new UserData("one","one@gmail.com","one1");
+        UserData two = new UserData("two","two@gmail.com","two2");
+        user.createUser("one","one1","one@gmail.com");
+        user.createUser("two","two2","two2@gmail.com");
+        game.createGame("test1");
+        game.createGame("test2");
+        auth.createAuth(one);
+        auth.createAuth(two);
+        //Clearing the stuff
+        ClearService clearService = new ClearService();
+        clearService.clear(user,auth,game);
+        assertTrue(user.getAllUsers().isEmpty());
+        assertTrue(game.getAllGames().isEmpty());
+        assertTrue(auth.getAllAuths().isEmpty());
+        }
+
+        @Test
+    public void testClearAuthDaoError() throws DataAccessException {
             //Populating it with stuff
             UserDao user = new MemoryUserDao();
             GameDao game = new MemoryGameDao();
@@ -27,18 +52,29 @@ public class ClearServiceTests {
             user.createUser("two","two2","two2@gmail.com");
             game.createGame("test1");
             game.createGame("test2");
-            try {
-                auth.createAuth(one);
-                auth.createAuth(two);
-            } catch (DataAccessException e) {
-                throw new RuntimeException(e);
-            }
-        //Clearing the stuff
+            auth.createAuth(one);
+            auth.createAuth(two);
+            //Clearing the stuff
             ClearService clearService = new ClearService();
-            clearService.clear(user,auth,game);
-            assertTrue(user.getAllUsers().isEmpty());
-            assertTrue(game.getAllGames().isEmpty());
-            assertTrue(auth.getAllAuths().isEmpty());
+            assertThrows(DaoException.class,() -> clearService.clear(user,null,game));
         }
 
+        @Test
+    public void testClearUserDaoError() throws DataAccessException {
+            //Populating it with stuff
+            UserDao user = new MemoryUserDao();
+            GameDao game = new MemoryGameDao();
+            AuthDao auth = new MemoryAuthDao();
+            UserData one = new UserData("one", "one@gmail.com", "one1");
+            UserData two = new UserData("two", "two@gmail.com", "two2");
+            user.createUser("one", "one1", "one@gmail.com");
+            user.createUser("two", "two2", "two2@gmail.com");
+            game.createGame("test1");
+            game.createGame("test2");
+            auth.createAuth(one);
+            auth.createAuth(two);
+            //Clearing the stuff
+            ClearService clearService = new ClearService();
+            assertThrows(DaoException.class, () -> clearService.clear(user, auth,null));
+        }
 }

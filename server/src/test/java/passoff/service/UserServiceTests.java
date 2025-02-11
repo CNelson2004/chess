@@ -38,56 +38,51 @@ public class UserServiceTests {
         }
 
         @Test
-        public void testRegisterFailEmailInvalid() throws DataAccessException {
+        public void testRegisterFailEmailInvalid(){
             RegisterRequest r = new RegisterRequest("Catsi", "C@t", "Cassimail.com");
-            RegisterResult result = u.register(r, uDao, aDao);
-            assertEquals("Email is not valid", result.message());
+            RegisterRequest finalR = r;
+            assertThrows(InputException.class,() -> u.register(finalR, uDao, aDao));
 
             r = new RegisterRequest("Catsi2", "C@t", "Cassi@mailcom");
-            result = u.register(r, uDao, aDao);
-            assertEquals("Email is not valid", result.message());
+            RegisterRequest finalR1 = r;
+            assertThrows(InputException.class,() -> u.register(finalR1, uDao, aDao));
 
             r = new RegisterRequest("Catsi3", "C@t", "Cassi@mail.org");
-            result = u.register(r, uDao, aDao);
-            assertEquals("Email is not valid", result.message());
+            RegisterRequest finalR2 = r;
+            assertThrows(InputException.class,() -> u.register(finalR2, uDao, aDao));
         }
 
         @Test
-        public void testRegisterFailUsernameTaken() throws DataAccessException {
+        public void testRegisterFailUsernameTaken() throws DataAccessException{
             RegisterRequest r = new RegisterRequest("Catsi", "C@t", "Cassi@mail.com");
             u.register(r, uDao, aDao);
-
             r = new RegisterRequest("Catsi", "C@tti", "Cassi@mail.com");
-            RegisterResult result = u.register(r, uDao, aDao);
-            assertEquals("Username is already taken", result.message());
+            RegisterRequest finalR = r;
+            assertThrows(DuplicateException.class,() -> u.register(finalR, uDao, aDao));
         }
 
         @Test
-        public void testRegisterFailUsernameNull() throws DataAccessException {
+        public void testRegisterFailUsernameNull(){
             RegisterRequest r = new RegisterRequest(null, "C@t", "Cassi@mail.com");
-            RegisterResult result = u.register(r, uDao, aDao);
-            assertEquals("Username is null", result.message());
+            assertThrows(InputException.class,() -> u.register(r, uDao, aDao));
         }
 
         @Test
-        public void testRegisterFailPasswordNull() throws DataAccessException {
+        public void testRegisterFailPasswordNull(){
             RegisterRequest r = new RegisterRequest("Catsi", null, "Cassi@mail.com");
-            RegisterResult result = u.register(r, uDao, aDao);
-            assertEquals("Password is null", result.message());
+            assertThrows(InputException.class,() -> u.register(r, uDao, aDao));
         }
 
         @Test
-        public void testRegisterFailAuthDaoNull() throws DataAccessException {
+        public void testRegisterFailAuthDaoNull(){
             RegisterRequest r = new RegisterRequest("Catsi", "C@t", "Cassi@mail.com");
-            RegisterResult result = u.register(r, uDao, null);
-            assertEquals("AuthDao is null", result.message());
+            assertThrows(DaoException.class,() -> u.register(r, uDao, null));
         }
 
         @Test
-        public void testRegisterFailUserDaoNull() throws DataAccessException {
+        public void testRegisterFailUserDaoNull(){
             RegisterRequest r = new RegisterRequest("Catsi", "C@t", "Cassi@mail.com");
-            RegisterResult result = u.register(r, null, aDao);
-            assertEquals("UserDao is null", result.message());
+            assertThrows(DaoException.class,() -> u.register(r, null, aDao));
         }
     }
 
@@ -114,38 +109,33 @@ public class UserServiceTests {
         }
 
         @Test
-        public void testLoginFailUsernameDoesNotExist() throws DataAccessException {
+        public void testLoginFailUsernameDoesNotExist(){
             LoginRequest r = new LoginRequest("Dogsi","C@t");
-            LoginResult result = u.login(r,uDao,aDao);
-            assertEquals("Username doesn't exist",result.message());
+            assertThrows(InputException.class,() -> u.login(r,uDao,aDao));
         }
 
         @Test
-        public void testLoginFailBadPassword() throws DataAccessException {
+        public void testLoginFailBadPassword(){
             LoginRequest r = new LoginRequest("Catsi","Dog");
-            LoginResult result = u.login(r,uDao,aDao);
-            assertEquals("Incorrect password",result.message());
+            assertThrows(AuthorizationException.class,() -> u.login(r,uDao,aDao));
         }
 
         @Test
         public void testLoginFailUsernameNull() throws DataAccessException {
             LoginRequest r = new LoginRequest(null,"C@t");
-            LoginResult result = u.login(r,uDao,aDao);
-            assertEquals("Username is null",result.message());
+            assertThrows(InputException.class,() -> u.login(r,uDao,aDao));
         }
 
         @Test
         public void testLoginFailUserDaoNull() throws DataAccessException {
             LoginRequest r = new LoginRequest("Catsi","C@t");
-            LoginResult result = u.login(r,null,aDao);
-            assertEquals("UserDao is null",result.message());
+            assertThrows(DaoException.class,() -> u.login(r,null,aDao));
         }
 
         @Test
         public void testLoginFailAuthDaoNull() throws DataAccessException {
             LoginRequest r = new LoginRequest("Catsi","C@t");
-            LoginResult result = u.login(r,uDao,null);
-            assertEquals("AuthDao is null",result.message());
+            assertThrows(DaoException.class,() -> u.login(r,uDao,null));
         }
     }
 
@@ -171,17 +161,15 @@ public class UserServiceTests {
         }
 
         @Test
-        public void testLogoutFailInvalidToken() throws DataAccessException {
+        public void testLogoutFailInvalidToken(){
             LogoutRequest r = new LogoutRequest("123456789");
-            LogoutResult result = u.logout(r,aDao);
-            assertEquals("Bad authentication token",result.message());
+            assertThrows(AuthorizationException.class,() -> u.logout(r,aDao));
         }
 
         @Test
-        public void testLogoutFailAuthDaoNull() throws DataAccessException {
+        public void testLogoutFailAuthDaoNull(){
             LogoutRequest r = new LogoutRequest(token);
-            LogoutResult result = u.logout(r,null);
-            assertEquals("AuthDao is null",result.message());
+            assertThrows(DaoException.class,() -> u.logout(r,null));
         }
     }
 }
