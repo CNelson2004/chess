@@ -36,7 +36,7 @@ public class GameServiceTests {
             CreateResult result = g.create(r,aDao,gDao);
 
             assertEquals(1,gDao.getAllGames().size());
-            assertEquals("Success",result.message());
+            assertNull(result.message());
             assertEquals("first",gDao.getGame(result.gameID()).gameName());
         }
         @Test
@@ -83,7 +83,7 @@ public class GameServiceTests {
             JoinRequest r = new JoinRequest("WHITE",gameID,token);
             JoinResult result = g.join(r,aDao,gDao);
 
-            assertEquals("Success",result.message());
+            assertNull(result.message());
             assertEquals(1,gDao.getAllGames().size());
             assertEquals(new GameData("Catsi",null,"first",gameID,gDao.getGame("first").game()),gDao.getGame(gameID));
         }
@@ -133,7 +133,7 @@ public class GameServiceTests {
             ListRequest r = new ListRequest(token);
             ListResult result = g.list(r,aDao,gDao);
 
-            assertEquals("Success",result.message());
+            assertNull(result.message());
             assertEquals(0,result.allGames().size());
         }
 
@@ -145,7 +145,7 @@ public class GameServiceTests {
             ListRequest r = new ListRequest(token);
             ListResult result = g.list(r,aDao,gDao);
 
-            assertEquals("Success",result.message());
+            assertNull(result.message());
             assertEquals(1,result.allGames().size());
             assertNotNull(gDao.getGame("first"));
         }
@@ -160,7 +160,7 @@ public class GameServiceTests {
             ListRequest r = new ListRequest(token);
             ListResult result = g.list(r,aDao,gDao);
 
-            assertEquals("Success",result.message());
+            assertNull(result.message());
             assertEquals(2,result.allGames().size());
             assertNotNull(gDao.getGame("first"));
             assertNotNull(gDao.getGame("second"));

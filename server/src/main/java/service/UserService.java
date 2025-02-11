@@ -57,7 +57,7 @@ public class UserService {
         //Login the user (create new AuthToken model object and insert it into the database)
         AuthData token = aDao.createAuth(user);
         //Returning RegisterResult
-        return new RegisterResult(r.username(),token.authToken(),"Success");
+        return new RegisterResult(r.username(),token.authToken(),null);
     }
 
 
@@ -74,7 +74,7 @@ public class UserService {
         //Creating an authToken for the user (automatically added to database)
         AuthData token = aDao.createAuth(user);
         //returning LoginResult
-        return new LoginResult(r.username(),token.authToken(),"Success");
+        return new LoginResult(r.username(),token.authToken(),null);
     }
     public LogoutResult logout(LogoutRequest r, MemoryAuthDao aDao) throws DataAccessException {
         //Verify authToken
@@ -84,6 +84,6 @@ public class UserService {
         AuthData auth = aDao.getAuth(r.authToken());
         aDao.deleteAuth(auth);
         //Returning LogoutResult
-        return new LogoutResult("Success");
+        return new LogoutResult(null);
     }
 }

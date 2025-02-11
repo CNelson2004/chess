@@ -33,7 +33,7 @@ public class UserServiceTests {
             UserData user = new UserData("Catsi", "Cassi@mail.com", "C@t");
             assertEquals(1, uDao.getAllUsers().size());
             assertEquals("Catsi", result.username());
-            assertEquals("Success", result.message());
+            assertNull(result.message());
             assertEquals(user, uDao.getUser("Catsi"));
         }
 
@@ -105,7 +105,7 @@ public class UserServiceTests {
 
             assertEquals(1,aDao.getAllAuths().size());
             assertEquals("Catsi",result.username());
-            assertEquals("Success",result.message());
+            assertNull(result.message());
         }
 
         @Test
@@ -157,7 +157,7 @@ public class UserServiceTests {
             LogoutResult result = u.logout(r, aDao);
 
             assertTrue(aDao.getAllAuths().isEmpty());
-            assertEquals("Success",result.message());
+            assertNull(result.message());
         }
 
         @Test

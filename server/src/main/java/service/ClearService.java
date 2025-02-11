@@ -10,6 +10,6 @@ public class ClearService {
         aDao.clear();
         gDao.clear();
         uDao.clear();
-        return new ClearResult("Success");
+        return new ClearResult(null);
     }
 }

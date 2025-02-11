@@ -50,7 +50,7 @@ public class GameService {
         //(You don't automatically join game upon creation)
         GameData game = gDao.createGame(r.gameName());
         //Return CreateResult
-        return new CreateResult(game.gameID(),"Success");
+        return new CreateResult(game.gameID(),null);
     }
     public JoinResult join(JoinRequest r, MemoryAuthDao aDao, MemoryGameDao gDao) throws DataAccessException {
         //Verify input
@@ -74,7 +74,7 @@ public class GameService {
         //update game with username being their color now (new game automatically added to database & old one deleted)
         GameData updatedGame = gDao.updateGame(game,r.playerColor(),username);
         //Return JoinResult
-        return new JoinResult("Success");
+        return new JoinResult(null);
     }
     public ListResult list(ListRequest r, MemoryAuthDao aDao, MemoryGameDao gDao){
         //Validate Input
@@ -85,6 +85,6 @@ public class GameService {
         //Get all the games [getAllGames()]
         Collection<GameData> allGames = gDao.getAllGames();
         //Return ListResult
-        return new ListResult(allGames,"Success");
+        return new ListResult(allGames,null);
     }
 }
