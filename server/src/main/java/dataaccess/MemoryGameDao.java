@@ -33,7 +33,7 @@ public class MemoryGameDao implements GameDao{
                 theGame = new GameData(null, null, gameName, gameID, new ChessGame());
                 if (theGame.gameID() == game.gameID()) {flag = true;}
             }
-            if (!flag) break;
+            if (!flag){break;}
         }
         if (theGame.gameID() == -1) {throw new DataAccessException("Couldn't create a game");}
             games.add(theGame);

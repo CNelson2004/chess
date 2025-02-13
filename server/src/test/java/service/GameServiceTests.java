@@ -1,7 +1,7 @@
-package passoff.service;
+package service;
 
-import Requests.*;
-import Results.*;
+import requests.*;
+import results.*;
 import dataaccess.*;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;

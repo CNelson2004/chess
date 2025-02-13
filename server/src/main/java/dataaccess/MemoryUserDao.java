@@ -31,10 +31,4 @@ public class MemoryUserDao implements UserDao{
         return null;
         //Throw nullError saying that token does not exist in database
     }
-
-    public void deleteUser(UserData user) throws DataAccessException {
-        if(user==null){throw new DataAccessException("UserData is null");}
-        users.removeIf(current -> current.name().equals(user.name()));
-        //^For-each loop w/ if statement inside
-    }
 }

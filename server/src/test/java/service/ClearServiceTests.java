@@ -1,4 +1,4 @@
-package passoff.service;
+package service;
 
 import dataaccess.*;
 import model.*;
@@ -11,13 +11,6 @@ import service.DaoException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearServiceTests {
-    //Simple Asserts: assertEquals(), assertTrue(), assertNotNull(), and assertThrows()
-    //            assertEquals(200, 100 + 100);
-//            assertTrue(100 == 2 * 50);
-//            assertNotNull(new Object(), "Response did not return authentication String");
-//            assertThrows(InvalidArgumentException.class, () -> {
-//                throw new InvalidArgumentException();
-//            });
     @Test
     public void testClearPass() throws DataAccessException {
         //Populating it with stuff

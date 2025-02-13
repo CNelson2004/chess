@@ -1,5 +1,5 @@
 package service;
-import Results.ClearResult;
+import results.ClearResult;
 import dataaccess.*;
 
 public class ClearService {

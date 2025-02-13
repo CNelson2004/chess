@@ -1,13 +1,11 @@
 package server;
 
-import Requests.*;
-import Results.*;
+import requests.*;
+import results.*;
 import dataaccess.*;
 import service.*;
 import spark.*;
 import com.google.gson.Gson;
-
-import java.io.Reader;
 
 public class Server {
 

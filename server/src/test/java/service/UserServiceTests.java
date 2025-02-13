@@ -1,7 +1,7 @@
-package passoff.service;
+package service;
 
-import Requests.*;
-import Results.*;
+import requests.*;
+import results.*;
 import dataaccess.*;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -143,7 +143,7 @@ public class UserServiceTests {
     class LogoutTests {
         String token;
         @BeforeEach
-        void LogoutSetUp() throws DataAccessException {
+        void logoutSetUp() throws DataAccessException {
             //Quickly registering user (which also logs them in)
             RegisterResult temp = u.register(new RegisterRequest("Catsi","C@t","Cassi@mail.com"),uDao,aDao);
             //Getting authToken

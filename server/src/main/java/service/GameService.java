@@ -1,11 +1,11 @@
 package service;
 
-import Requests.CreateRequest;
-import Requests.JoinRequest;
-import Requests.ListRequest;
-import Results.CreateResult;
-import Results.JoinResult;
-import Results.ListResult;
+import requests.CreateRequest;
+import requests.JoinRequest;
+import requests.ListRequest;
+import results.CreateResult;
+import results.JoinResult;
+import results.ListResult;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDao;
 import dataaccess.MemoryGameDao;
@@ -32,8 +32,8 @@ public class GameService {
     }
 
     boolean verifyAuth(String authToken, MemoryAuthDao aDao){
-        if(authToken == null) return false;
-        if(aDao == null) return false;
+        if(authToken == null){return false;}
+        if(aDao == null){return false;}
         AuthData aData = aDao.getAuth(authToken);
         return aData != null;
     }

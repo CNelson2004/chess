@@ -1,18 +1,18 @@
 package service;
 
-import Requests.LoginRequest;
-import Requests.LogoutRequest;
-import Requests.RegisterRequest;
-import Results.LoginResult;
-import Results.LogoutResult;
-import Results.RegisterResult;
+import requests.LoginRequest;
+import requests.LogoutRequest;
+import requests.RegisterRequest;
+import results.LoginResult;
+import results.LogoutResult;
+import results.RegisterResult;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
 public class UserService {
     boolean verifyInput(String item, String type){
-        if(item == null) return false;
+        if(item == null){return false;}
         switch(type){
             case "username", "password", "email":
                 return true;
@@ -32,8 +32,8 @@ public class UserService {
     }
 
     boolean verifyAuth(String authToken, MemoryAuthDao aDao){
-        if(authToken == null) return false;
-        if(aDao == null) return false;
+        if(authToken == null){return false;}
+        if(aDao == null){return false;}
         AuthData aData = aDao.getAuth(authToken);
         return aData != null;
     }
