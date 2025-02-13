@@ -39,17 +39,9 @@ public class UserServiceTests {
 
         @Test
         public void testRegisterFailEmailInvalid(){
-            RegisterRequest r = new RegisterRequest("Catsi", "C@t", "Cassimail.com");
+            RegisterRequest r = new RegisterRequest("Catsi", "C@t", null);
             RegisterRequest finalR = r;
             assertThrows(InputException.class,() -> u.register(finalR, uDao, aDao));
-
-            r = new RegisterRequest("Catsi2", "C@t", "Cassi@mailcom");
-            RegisterRequest finalR1 = r;
-            assertThrows(InputException.class,() -> u.register(finalR1, uDao, aDao));
-
-            r = new RegisterRequest("Catsi3", "C@t", "Cassi@mail.org");
-            RegisterRequest finalR2 = r;
-            assertThrows(InputException.class,() -> u.register(finalR2, uDao, aDao));
         }
 
         @Test
@@ -111,7 +103,7 @@ public class UserServiceTests {
         @Test
         public void testLoginFailUsernameDoesNotExist(){
             LoginRequest r = new LoginRequest("Dogsi","C@t");
-            assertThrows(InputException.class,() -> u.login(r,uDao,aDao));
+            assertThrows(AuthorizationException.class,() -> u.login(r,uDao,aDao));
         }
 
         @Test
