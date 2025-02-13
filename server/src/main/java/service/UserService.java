@@ -14,10 +14,10 @@ public class UserService {
     boolean verifyInput(String item, String type){
         if(item == null) return false;
         switch(type){
-            case "username", "password":
+            case "username", "password", "email":
                 return true;
-            case "email":
-                return item.contains("@")&&item.contains(".com");
+            //case "email":
+                //return item.contains("@")&&item.contains(".com");
             default:
                 throw new IllegalArgumentException("type not recognized");
         }
