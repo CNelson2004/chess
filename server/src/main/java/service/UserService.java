@@ -69,7 +69,7 @@ public class UserService {
         if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
         //Checking the password
         UserData user = uDao.getUser(r.username());
-        if (user==null){throw new InputException("Error: bad request");}
+        if (user==null){throw new AuthorizationException("Error: unauthorized");}
         if (!user.password().equals(r.password())){throw new AuthorizationException("Error: unauthorized");}
         //Creating an authToken for the user (automatically added to database)
         AuthData token = aDao.createAuth(user);

@@ -60,6 +60,7 @@ public class Server {
             return new Gson().toJson(result);
         }
         catch(DaoException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         }
     }
@@ -72,12 +73,16 @@ public class Server {
             res.type("application/json");
             return new Gson().toJson(result); //200
         } catch(InputException e){
+            res.status(400);
             return new Gson().toJson(new ExceptionHandler("Error: bad request")); //400
         } catch(DuplicateException e){
+            res.status(403);
             return new Gson().toJson(new ExceptionHandler("Error: already taken")); //403
         } catch(DaoException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         } catch(DataAccessException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database Data was not found")); //500 Error
         }
     }
@@ -90,12 +95,16 @@ public class Server {
             res.type("application/json");
             return new Gson().toJson(result); //200
         } catch(AuthorizationException e){
+            res.status(401);
             return new Gson().toJson(new ExceptionHandler("Error: unauthorized")); //401
         } catch(DaoException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         } catch(InputException e){
+            res.status(400);
             return new Gson().toJson(new ExceptionHandler("Error: bad request")); //500 (Technically 400)
         } catch(DataAccessException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database Data was not found")); //500 Error
         }
     }
@@ -108,10 +117,13 @@ public class Server {
             res.type("application/json");
             return new Gson().toJson(result); //200
         } catch(AuthorizationException e){
+            res.status(401);
             return new Gson().toJson(new ExceptionHandler("Error: unauthorized")); //401
         } catch(DaoException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         } catch(DataAccessException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database Data was not found")); //500 Error
         }
     }
@@ -127,6 +139,7 @@ public class Server {
             res.status(401);
             return new Gson().toJson(new ExceptionHandler("Error: unauthorized")); //401
         } catch(DaoException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         }
     }
@@ -140,12 +153,16 @@ public class Server {
             res.type("application/json");
             return new Gson().toJson(result); //200
         } catch(InputException e){
+            res.status(400);
             return new Gson().toJson(new ExceptionHandler("Error: bad request")); //400
         } catch(AuthorizationException e){
+            res.status(401);
             return new Gson().toJson(new ExceptionHandler("Error: unauthorized")); //401
         } catch(DaoException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         } catch(DataAccessException e) {
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database Data was not found")); //500 Error
         }
     }
@@ -159,14 +176,19 @@ public class Server {
             res.type("application/json");
             return new Gson().toJson(result); //200
         } catch(InputException e){
+            res.status(400);
             return new Gson().toJson(new ExceptionHandler("Error: bad request")); //400
         } catch(AuthorizationException e){
+            res.status(401);
             return new Gson().toJson(new ExceptionHandler("Error: unauthorized")); //401
         } catch(DuplicateException e){
+            res.status(403);
             return new Gson().toJson(new ExceptionHandler("Error: already taken")); //403
         } catch(DaoException e){
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         } catch(DataAccessException e) {
+            res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database Data was not found")); //500 Error
         }
     }
