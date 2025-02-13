@@ -134,7 +134,7 @@ public class GameServiceTests {
             ListResult result = g.list(r,aDao,gDao);
 
             assertNull(result.message());
-            assertEquals(0,result.allGames().size());
+            assertEquals(0,result.games().size());
         }
 
         @Test
@@ -146,7 +146,7 @@ public class GameServiceTests {
             ListResult result = g.list(r,aDao,gDao);
 
             assertNull(result.message());
-            assertEquals(1,result.allGames().size());
+            assertEquals(1,result.games().size());
             assertNotNull(gDao.getGame("first"));
         }
 
@@ -161,7 +161,7 @@ public class GameServiceTests {
             ListResult result = g.list(r,aDao,gDao);
 
             assertNull(result.message());
-            assertEquals(2,result.allGames().size());
+            assertEquals(2,result.games().size());
             assertNotNull(gDao.getGame("first"));
             assertNotNull(gDao.getGame("second"));
         }

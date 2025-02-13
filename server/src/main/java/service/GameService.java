@@ -17,6 +17,7 @@ import java.util.Collection;
 
 public class GameService {
     boolean verifyJoinInput(String color, int gameID){
+        if(color == null){return false;}
         if(!(color.equals("WHITE") || color.equals("BLACK"))){return false;}
         int digits = String.valueOf(gameID).length();
         return digits == 6;
@@ -65,14 +66,18 @@ public class GameService {
         switch(r.playerColor()){
             case "WHITE":
                 if(game.whiteUsername()!=null){throw new DuplicateException("Error: already taken");}
+                else{break;}
             case "BLACK":
                 if(game.blackUsername()!=null){throw new DuplicateException("Error: already taken");}
+                else{break;}
+            default:
+                throw new InputException("Error: bad request");
         }
         //Get username by getting Authdata object with authToken [getAuth(authToken)]
         AuthData auth = aDao.getAuth(r.authToken());
         String username = auth.username();
         //update game with username being their color now (new game automatically added to database & old one deleted)
-        GameData updatedGame = gDao.updateGame(game,r.playerColor(),username);
+        gDao.updateGame(game,r.playerColor(),username);
         //Return JoinResult
         return new JoinResult(null);
     }

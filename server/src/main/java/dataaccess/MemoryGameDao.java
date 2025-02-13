@@ -71,8 +71,8 @@ public class MemoryGameDao implements GameDao{
         deleteGame(game);
         GameData updatedGame = new GameData(game.whiteUsername(),username,game.gameName(),game.gameID(),game.game());
         if(color.equals("WHITE")){updatedGame = new GameData(username,game.blackUsername(),game.gameName(),game.gameID(),game.game());}
-        games.add(updatedGame);
         games.remove(game);
+        games.add(updatedGame);
         return updatedGame;
     }
 }
