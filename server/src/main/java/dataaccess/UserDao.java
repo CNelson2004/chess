@@ -11,6 +11,5 @@ public interface UserDao {
     UserData createUser(String username, String password, String email);
     UserData getUser(String username);
     Collection<UserData> getAllUsers();
-    //updateUser?
 }
 

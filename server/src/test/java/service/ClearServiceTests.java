@@ -2,11 +2,8 @@ package service;
 
 import dataaccess.*;
 import model.*;
-import org.junit.jupiter.api.Assertions;
-import service.ClearService;
 
 import org.junit.jupiter.api.Test;
-import service.DaoException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
