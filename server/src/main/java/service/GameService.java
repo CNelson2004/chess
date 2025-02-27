@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.*;
 import requests.CreateRequest;
 import requests.JoinRequest;
 import requests.ListRequest;
@@ -23,22 +24,22 @@ public class GameService {
         return digits == 6;
     }
 
-    boolean verifyDao(MemoryAuthDao aDao){
+    boolean verifyDao(AuthDao aDao){
         return aDao != null;
     }
 
-    boolean verifyDao(MemoryGameDao gDao){
+    boolean verifyDao(GameDao gDao){
         return gDao != null;
     }
 
-    boolean verifyAuth(String authToken, MemoryAuthDao aDao){
+    boolean verifyAuth(String authToken, AuthDao aDao) throws DataAccessException {
         if(authToken == null){return false;}
         if(aDao == null){return false;}
         AuthData aData = aDao.getAuth(authToken);
         return aData != null;
     }
 
-    public CreateResult create(CreateRequest r,MemoryAuthDao aDao, MemoryGameDao gDao) throws DataAccessException {
+    public CreateResult create(CreateRequest r,AuthDao aDao, GameDao gDao) throws DataAccessException {
         //Verify input
         if(r.gameName()==null){throw new InputException("Error: bad request");}
         if(!verifyDao(aDao)){throw new DaoException("Error: Database is null");}
@@ -53,7 +54,7 @@ public class GameService {
         //Return CreateResult
         return new CreateResult(game.gameID(),null);
     }
-    public JoinResult join(JoinRequest r, MemoryAuthDao aDao, MemoryGameDao gDao) throws DataAccessException {
+    public JoinResult join(JoinRequest r, AuthDao aDao, GameDao gDao) throws DataAccessException {
         //Verify input
         if (!verifyJoinInput(r.playerColor(),r.gameID())){throw new InputException("Error: bad request");}
         if(!verifyDao(aDao)){throw new DaoException("Error: Database is null");}
@@ -81,7 +82,7 @@ public class GameService {
         //Return JoinResult
         return new JoinResult(null);
     }
-    public ListResult list(ListRequest r, MemoryAuthDao aDao, MemoryGameDao gDao){
+    public ListResult list(ListRequest r, AuthDao aDao, GameDao gDao) throws DataAccessException {
         //Validate Input
         if(!verifyDao(aDao)){throw new DaoException("Error: Database is null");}
         if(!verifyDao(gDao)){throw new DaoException("Error: Database is null");}

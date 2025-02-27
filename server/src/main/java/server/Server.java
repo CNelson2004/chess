@@ -10,13 +10,39 @@ import com.google.gson.Gson;
 public class Server {
 
     //In constructor for server initizlize DAOs
-    MemoryUserDao uDao;
-    MemoryAuthDao aDao;
-    MemoryGameDao gDao;
-    public Server(){
-        uDao = new MemoryUserDao();
-        aDao = new MemoryAuthDao();
-        gDao = new MemoryGameDao();
+    UserDao uDao;
+    AuthDao aDao;
+    GameDao gDao;
+    public Server(){ //The tests call a Server with no parameters, so how do I change it with one line?
+        try {
+            uDao = new SQLUserDao();
+            aDao = new SQLAuthDao();
+            gDao = new SQLGameDao();
+        } catch (DataAccessException e){
+            System.out.println("Database connection error with SQL, switching to memory");
+            uDao = new MemoryUserDao();
+            aDao = new MemoryAuthDao();
+            gDao = new MemoryGameDao();
+        }
+    }
+
+    public Server(String type){
+        if(type.equals("sql")) {
+            try {
+                uDao = new SQLUserDao();
+                aDao = new SQLAuthDao();
+                gDao = new SQLGameDao();
+            } catch (DataAccessException e){
+                System.out.println("Database connection error with SQL, switching to memory");
+                uDao = new MemoryUserDao();
+                aDao = new MemoryAuthDao();
+                gDao = new MemoryGameDao();
+            }
+        }else{
+            uDao = new MemoryUserDao();
+            aDao = new MemoryAuthDao();
+            gDao = new MemoryGameDao();
+        }
     }
 
     public int run(int desiredPort) {
@@ -60,6 +86,9 @@ public class Server {
         catch(DaoException e){
             res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
+        } catch (DataAccessException e) {
+            res.status(500);
+            return new Gson().toJson(new ExceptionHandler("Error: Database connection error")); //500
         }
     }
 
@@ -81,7 +110,7 @@ public class Server {
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
         } catch(DataAccessException e){
             res.status(500);
-            return new Gson().toJson(new ExceptionHandler("Error: Database Data was not found")); //500 Error
+            return new Gson().toJson(new ExceptionHandler("Error: Couldn't connect to database")); //500 Error
         }
     }
 
@@ -139,6 +168,9 @@ public class Server {
         } catch(DaoException e){
             res.status(500);
             return new Gson().toJson(new ExceptionHandler("Error: Database is null")); //500
+        } catch(DataAccessException e){
+            res.status(500);
+            return new Gson().toJson(new ExceptionHandler("Error: Couldn't connect to database")); //500
         }
     }
 

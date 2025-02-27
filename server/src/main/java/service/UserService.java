@@ -23,22 +23,22 @@ public class UserService {
         }
     }
 
-    boolean verifyDao(MemoryUserDao uDao){
+    boolean verifyDao(UserDao uDao){
         return uDao != null;
     }
 
-    boolean verifyDao(MemoryAuthDao aDao){
+    boolean verifyDao(AuthDao aDao){
         return aDao != null;
     }
 
-    boolean verifyAuth(String authToken, MemoryAuthDao aDao){
+    boolean verifyAuth(String authToken, AuthDao aDao) throws DataAccessException {
         if(authToken == null){return false;}
         if(aDao == null){return false;}
         AuthData aData = aDao.getAuth(authToken);
         return aData != null;
     }
 
-    public RegisterResult register(RegisterRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) throws DataAccessException {
+    public RegisterResult register(RegisterRequest r, UserDao uDao, AuthDao aDao) throws DataAccessException {
         //verifying input
         if(!(verifyInput(r.username(),"username"))){throw new InputException("Error: bad request");}
             //return new RegisterResult(null,null,"Username is null");}
@@ -61,7 +61,7 @@ public class UserService {
     }
 
 
-    public LoginResult login(LoginRequest r, MemoryUserDao uDao, MemoryAuthDao aDao) throws DataAccessException {
+    public LoginResult login(LoginRequest r, UserDao uDao, AuthDao aDao) throws DataAccessException {
         //Verifying input
         if(!(verifyInput(r.username(),"username"))){throw new InputException("Error: bad request");}
         if(!(verifyInput(r.username(),"password"))){throw new InputException("Error: bad request");}
@@ -76,7 +76,7 @@ public class UserService {
         //returning LoginResult
         return new LoginResult(r.username(),token.authToken(),null);
     }
-    public LogoutResult logout(LogoutRequest r, MemoryAuthDao aDao) throws DataAccessException {
+    public LogoutResult logout(LogoutRequest r, AuthDao aDao) throws DataAccessException {
         //Verify authToken
         if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
         if(!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}

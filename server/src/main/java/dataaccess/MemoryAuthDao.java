@@ -10,11 +10,11 @@ import java.util.UUID;
 public class MemoryAuthDao implements AuthDao{
     private final ArrayList<AuthData> authTokens = new ArrayList<>();
 
-    public void clear(){
+    public void clear() throws DataAccessException {
         getAllAuths().clear();
     }
 
-    public Collection<AuthData> getAllAuths(){return authTokens;}
+    public Collection<AuthData> getAllAuths() throws DataAccessException{return authTokens;}
 
     public AuthData createAuth(UserData user) throws DataAccessException{
         if(user==null){throw new DataAccessException("UserData is null");}
@@ -25,7 +25,8 @@ public class MemoryAuthDao implements AuthDao{
         return authData;
     }
 
-    public AuthData getAuth(String aToken){
+    public AuthData getAuth(String aToken) throws DataAccessException{
+        if(aToken==null){throw new DataAccessException("authToken is null");}
         for(AuthData token: authTokens){
             if(token.authToken().equals(aToken)){
                 return token;

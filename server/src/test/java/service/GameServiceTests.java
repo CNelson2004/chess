@@ -129,7 +129,7 @@ public class GameServiceTests {
     @Nested
     class ListTests{
         @Test
-        void testListPassZeroGames(){
+        void testListPassZeroGames() throws DataAccessException {
             ListRequest r = new ListRequest(token);
             ListResult result = g.list(r,aDao,gDao);
 
