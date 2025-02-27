@@ -1,17 +1,10 @@
 package service;
 
 import dataaccess.*;
-import requests.CreateRequest;
-import requests.JoinRequest;
-import requests.ListRequest;
-import results.CreateResult;
-import results.JoinResult;
-import results.ListResult;
+import requests.*;
+import results.*;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDao;
-import dataaccess.MemoryGameDao;
-import model.AuthData;
-import model.GameData;
+import model.*;
 
 import java.util.Collection;
 
@@ -26,6 +19,7 @@ public class GameService {
 
     boolean verifyDao(AuthDao aDao){
         return aDao != null;
+        //return UserService.verifyDao(aDao); //<-Another option if you make verifyDao static in UserService
     }
 
     boolean verifyDao(GameDao gDao){

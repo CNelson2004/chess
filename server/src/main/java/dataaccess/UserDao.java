@@ -7,9 +7,9 @@ import java.util.Collection;
 
 //In phase 3 all of these Dao are going to store the info in memory directly, in lists, maps, etc.
 public interface UserDao {
-    void clear();
-    UserData createUser(String username, String password, String email);
-    UserData getUser(String username);
-    Collection<UserData> getAllUsers();
+    void clear() throws DataAccessException;
+    UserData createUser(String username, String password, String email) throws DataAccessException;
+    UserData getUser(String username) throws DataAccessException;
+    Collection<UserData> getAllUsers() throws DataAccessException;
 }
 

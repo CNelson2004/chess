@@ -12,12 +12,12 @@ import service.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTests {
-    MemoryAuthDao aDao;
-    MemoryGameDao gDao;
+    AuthDao aDao;
+    GameDao gDao;
     GameService g;
     String token;
     @BeforeEach
-    void setUp() throws DataAccessException {
+    void setUp() throws DataAccessException { //AuthDao and GameDao can be changed for testing SQL
         aDao = new MemoryAuthDao();
         gDao = new MemoryGameDao();
         g = new GameService();

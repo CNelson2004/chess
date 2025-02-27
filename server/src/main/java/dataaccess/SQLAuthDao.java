@@ -77,7 +77,7 @@ public class SQLAuthDao implements AuthDao {
     }
 
     //Overrides the method in SQL                {below} changed object to String since AuthData only has strings
-    private void executeUpdate(String statement, String... params) throws DataAccessException {
+    static void executeUpdate(String statement, String... params) throws DataAccessException { //... could be switched for []
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
@@ -86,7 +86,7 @@ public class SQLAuthDao implements AuthDao {
                     ps.setString(i + 1, param); //fills in the question mark of the statement with the current param
                 }
                 ps.executeUpdate();
-
+                //Generated key stuff
                 var rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     rs.getInt(1);
@@ -114,11 +114,15 @@ public class SQLAuthDao implements AuthDao {
 
     //If the database already does exist, then will this just add the table to it?
     private void configureDatabase() throws DataAccessException {
+        configureDatabase(createStatements);
+    }
+
+    static void configureDatabase(String[] createStatements) throws DataAccessException {
         DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) { //try to get a connection wtih the database
+        try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate(); //<- SQL executeUpdate function
+                    preparedStatement.executeUpdate();
                 }
             }
         } catch (SQLException ex) {

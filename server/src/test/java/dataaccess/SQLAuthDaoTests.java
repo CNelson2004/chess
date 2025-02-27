@@ -28,7 +28,7 @@ public class SQLAuthDaoTests {
     }
 
     @Test
-    public void testCreateAuthIntFail() throws DataAccessException {
+    public void testCreateAuthIntFail(){
         UserData user = new UserData(null,"cat@gmail.com","Catty");
         assertThrows(DataAccessException.class,() -> dao.createAuth(user));
     }
@@ -50,7 +50,7 @@ public class SQLAuthDaoTests {
     }
 
     @Test
-    public void testGetAuthFailNullAuth() throws DataAccessException {
+    public void testGetAuthFailNullAuth(){
         assertThrows(DataAccessException.class,() -> dao.getAuth(null));
     }
 

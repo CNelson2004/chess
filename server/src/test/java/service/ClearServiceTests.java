@@ -10,10 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClearServiceTests {
     @Test
     public void testClearPass() throws DataAccessException {
-        //Populating it with stuff
+        //Populating it with stuff - Daos can be changed to SQL for testing those
         UserDao user = new MemoryUserDao();
         GameDao game = new MemoryGameDao();
         AuthDao auth = new MemoryAuthDao();
+
         UserData one = new UserData("one","one@gmail.com","one1");
         UserData two = new UserData("two","two@gmail.com","two2");
         user.createUser("one","one1","one@gmail.com");

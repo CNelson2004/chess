@@ -1,14 +1,9 @@
 package service;
 
-import requests.LoginRequest;
-import requests.LogoutRequest;
-import requests.RegisterRequest;
-import results.LoginResult;
-import results.LogoutResult;
-import results.RegisterResult;
 import dataaccess.*;
-import model.AuthData;
-import model.UserData;
+import requests.*;
+import results.*;
+import model.*;
 
 public class UserService {
     boolean verifyInput(String item, String type){
@@ -67,10 +62,15 @@ public class UserService {
         if(!(verifyInput(r.username(),"password"))){throw new InputException("Error: bad request");}
         if(!(verifyDao(uDao))){throw new DaoException("Error: Database is null");}
         if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
-        //Checking the password
+        //Checking the password (and changing depending on Dao)
         UserData user = uDao.getUser(r.username());
         if (user==null){throw new AuthorizationException("Error: unauthorized");}
-        if (!user.password().equals(r.password())){throw new AuthorizationException("Error: unauthorized");}
+        if(uDao instanceof SQLUserDao){
+            //user.password is hashed if coming from SQL
+            if(!((SQLUserDao)uDao).checkPassword(user,r.password())){throw new AuthorizationException("Error: unauthorized");}
+        }else{
+            if (!user.password().equals(r.password())){throw new AuthorizationException("Error: unauthorized");}
+        }
         //Creating an authToken for the user (automatically added to database)
         AuthData token = aDao.createAuth(user);
         //returning LoginResult

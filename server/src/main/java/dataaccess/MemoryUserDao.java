@@ -22,7 +22,8 @@ public class MemoryUserDao implements UserDao{
         return user;
     }
 
-    public UserData getUser(String username){
+    public UserData getUser(String username) throws DataAccessException{
+        if(username==null){throw new DataAccessException("Username not in database.");}
         for(UserData current: users){
             if(current.name().equals(username)){
                 return current;

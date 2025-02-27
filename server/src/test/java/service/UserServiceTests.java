@@ -12,11 +12,11 @@ import service.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
-    MemoryUserDao uDao;
-    MemoryAuthDao aDao;
+    UserDao uDao;
+    AuthDao aDao;
     UserService u;
     @BeforeEach
-    void setUp(){
+    void setUp(){ //UserDao and AuthDao can be changed for checking SQL
         uDao = new MemoryUserDao();
         aDao = new MemoryAuthDao();
         u = new UserService();
