@@ -13,32 +13,27 @@ public class Server {
     UserDao uDao;
     AuthDao aDao;
     GameDao gDao;
-    public Server(){ //The tests call a Server with no parameters, so how do I change it with one line?
-        try {
-            uDao = new SQLUserDao();
-            aDao = new SQLAuthDao();
-            gDao = new SQLGameDao();
-        } catch (DataAccessException e){
-            System.out.println("Database connection error with SQL, switching to memory");
+    public Server(){
+        this("sql");
+    }
+
+    public Server(String type){
+        if(type.equals("sql")) {
+            initializeSQLs();
+        }else{
             uDao = new MemoryUserDao();
             aDao = new MemoryAuthDao();
             gDao = new MemoryGameDao();
         }
     }
 
-    public Server(String type){
-        if(type.equals("sql")) {
-            try {
-                uDao = new SQLUserDao();
-                aDao = new SQLAuthDao();
-                gDao = new SQLGameDao();
-            } catch (DataAccessException e){
-                System.out.println("Database connection error with SQL, switching to memory");
-                uDao = new MemoryUserDao();
-                aDao = new MemoryAuthDao();
-                gDao = new MemoryGameDao();
-            }
-        }else{
+    public void initializeSQLs(){
+        try {
+            uDao = new SQLUserDao();
+            aDao = new SQLAuthDao();
+            gDao = new SQLGameDao();
+        } catch (DataAccessException e){
+            System.out.println("Database connection error with SQL, switching to memory");
             uDao = new MemoryUserDao();
             aDao = new MemoryAuthDao();
             gDao = new MemoryGameDao();
