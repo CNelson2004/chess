@@ -87,7 +87,7 @@ public class SQLUserDao implements UserDao{
             PRIMARY KEY (id)
             );
             """
-    };
+    }; //The id may not be needed here due to never being used.
 
     private void configureDatabase() throws DataAccessException {
         SQLAuthDao.configureDatabase(createStatements);

@@ -47,8 +47,8 @@ public class SQLAuthDao implements AuthDao {
 
     //Helper function to getAuth which reads the data from the datatable
     private AuthData readAuth(ResultSet rs) throws SQLException {
-        var username = rs.getString("username");
-        var authToken = rs.getString("authToken");
+        String username = rs.getString("username");
+        String authToken = rs.getString("authToken");
         return new AuthData(username,authToken);
     }
 
