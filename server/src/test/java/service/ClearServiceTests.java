@@ -3,18 +3,24 @@ package service;
 import dataaccess.*;
 import model.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearServiceTests {
+    UserDao user;
+    AuthDao auth;
+    GameDao game;
+    @BeforeEach
+    public void setUp() throws DataAccessException {
+        user = new SQLUserDao();
+        auth = new SQLAuthDao();
+        game = new SQLGameDao();
+    }
+
     @Test
     public void testClearPass() throws DataAccessException {
-        //Populating it with stuff - Daos can be changed to SQL for testing those
-        UserDao user = new MemoryUserDao();
-        GameDao game = new MemoryGameDao();
-        AuthDao auth = new MemoryAuthDao();
-
         UserData one = new UserData("one","one@gmail.com","one1");
         UserData two = new UserData("two","two@gmail.com","two2");
         user.createUser("one","one1","one@gmail.com");
@@ -33,10 +39,6 @@ public class ClearServiceTests {
 
         @Test
     public void testClearAuthDaoError() throws DataAccessException {
-            //Populating it with stuff
-            UserDao user = new MemoryUserDao();
-            GameDao game = new MemoryGameDao();
-            AuthDao auth = new MemoryAuthDao();
             UserData one = new UserData("one","one@gmail.com","one1");
             UserData two = new UserData("two","two@gmail.com","two2");
             user.createUser("one","one1","one@gmail.com");
@@ -52,10 +54,6 @@ public class ClearServiceTests {
 
         @Test
     public void testClearUserDaoError() throws DataAccessException {
-            //Populating it with stuff
-            UserDao user = new MemoryUserDao();
-            GameDao game = new MemoryGameDao();
-            AuthDao auth = new MemoryAuthDao();
             UserData one = new UserData("one", "one@gmail.com", "one1");
             UserData two = new UserData("two", "two@gmail.com", "two2");
             user.createUser("one", "one1", "one@gmail.com");

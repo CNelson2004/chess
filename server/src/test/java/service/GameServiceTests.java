@@ -7,7 +7,6 @@ import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import service.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,7 +21,7 @@ public class GameServiceTests {
         gDao = new MemoryGameDao();
         g = new GameService();
         //Creating a user to make the game
-        MemoryUserDao uDao = new MemoryUserDao();
+        UserDao uDao = new MemoryUserDao();
         UserService u = new UserService();
         RegisterResult temp = u.register(new RegisterRequest("Catsi","C@t","Cassi@mail.com"),uDao,aDao);
         token = temp.authToken();

@@ -20,7 +20,7 @@ public class MemoryAuthDao implements AuthDao{
         if(user==null){throw new DataAccessException("UserData is null");}
         //Creates an AuthData(Authtoken) and adds it to the database.
         String token = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(token,user.name());
+        AuthData authData = new AuthData(user.name(),token);
         authTokens.add(authData);
         return authData;
     }
