@@ -45,8 +45,19 @@ public class UserService {
             //return new RegisterResult(null,null,"UserDao is null");}
         if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
             //return new RegisterResult(null,null, "AuthDao is null");}
-        //Checking if username is taken
-        if(uDao.getUser(r.username()) != null){throw new DuplicateException("Error: already taken");}
+        //Checking if username is taken (need to put in try block due to SQL compatability
+        if(uDao instanceof SQLUserDao) {
+            try {
+                uDao.getUser(r.username());
+                throw new DuplicateException("Error: already taken");
+            } catch (DataAccessException e) {
+                //continue
+            }
+        }else {
+            if (uDao.getUser(r.username()) != null) {
+                throw new DuplicateException("Error: already taken");
+            }
+        }
         //Creating a new User model object (User automatically added to database)
         UserData user = uDao.createUser(r.username(),r.password(),r.email());
         //Login the user (create new AuthToken model object and insert it into the database)
@@ -63,12 +74,18 @@ public class UserService {
         if(!(verifyDao(uDao))){throw new DaoException("Error: Database is null");}
         if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
         //Checking the password (and changing depending on Dao)
-        UserData user = uDao.getUser(r.username());
-        if (user==null){throw new AuthorizationException("Error: unauthorized");}
+        UserData user;
         if(uDao instanceof SQLUserDao){
             //user.password is hashed if coming from SQL
-            if(!((SQLUserDao)uDao).checkPassword(user,r.password())){throw new AuthorizationException("Error: unauthorized");}
+            try {
+                user = uDao.getUser(r.username());
+                if (!(((SQLUserDao)uDao).checkPassword(user,r.password()))){throw new AuthorizationException("Error: unauthorized");}
+            } catch(DataAccessException e){
+                throw new AuthorizationException("Error: unauthorized");
+            }
         }else{
+            user = uDao.getUser(r.username());
+            if(user==null){throw new AuthorizationException("Error: unauthorized");}
             if (!user.password().equals(r.password())){throw new AuthorizationException("Error: unauthorized");}
         }
         //Creating an authToken for the user (automatically added to database)
@@ -79,7 +96,15 @@ public class UserService {
     public LogoutResult logout(LogoutRequest r, AuthDao aDao) throws DataAccessException {
         //Verify authToken
         if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
-        if(!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}
+        if(aDao instanceof SQLAuthDao){
+            try{
+                verifyAuth(r.authToken(),aDao);
+            }catch(DataAccessException e){
+                throw new AuthorizationException("Error: unauthorized");
+            }
+        }else{
+            if(!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}
+        }
         //Deleting the authData object
         AuthData auth = aDao.getAuth(r.authToken());
         aDao.deleteAuth(auth);

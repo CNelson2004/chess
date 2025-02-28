@@ -1,5 +1,6 @@
 package service;
 
+import org.junit.jupiter.api.AfterEach;
 import requests.*;
 import results.*;
 import dataaccess.*;
@@ -17,14 +18,20 @@ public class GameServiceTests {
     String token;
     @BeforeEach
     void setUp() throws DataAccessException { //AuthDao and GameDao can be changed for testing SQL
-        aDao = new MemoryAuthDao();
-        gDao = new MemoryGameDao();
+        aDao = new SQLAuthDao();
+        gDao = new SQLGameDao();
         g = new GameService();
         //Creating a user to make the game
-        UserDao uDao = new MemoryUserDao();
+        UserDao uDao = new SQLUserDao();
         UserService u = new UserService();
         RegisterResult temp = u.register(new RegisterRequest("Catsi","C@t","Cassi@mail.com"),uDao,aDao);
         token = temp.authToken();
+    }
+
+    @AfterEach
+    public void setDown() throws DataAccessException {
+        gDao.clear();
+        aDao.clear();
     }
 
     @Nested

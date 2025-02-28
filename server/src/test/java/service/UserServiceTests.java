@@ -1,5 +1,6 @@
 package service;
 
+import org.junit.jupiter.api.AfterEach;
 import requests.*;
 import results.*;
 import dataaccess.*;
@@ -15,10 +16,16 @@ public class UserServiceTests {
     AuthDao aDao;
     UserService u;
     @BeforeEach
-    void setUp(){ //UserDao and AuthDao can be changed for checking SQL
-        uDao = new MemoryUserDao();
-        aDao = new MemoryAuthDao();
+    void setUp() throws DataAccessException { //UserDao and AuthDao can be changed for checking SQL
+        uDao = new SQLUserDao();
+        aDao = new SQLAuthDao();
         u = new UserService();
+    }
+
+    @AfterEach
+    public void setDown() throws DataAccessException {
+        uDao.clear();
+        aDao.clear();
     }
 
     @Nested
@@ -33,7 +40,11 @@ public class UserServiceTests {
             assertEquals(1, uDao.getAllUsers().size());
             assertEquals("Catsi", result.username());
             assertNull(result.message());
-            assertEquals(user, uDao.getUser("Catsi"));
+            if(uDao instanceof SQLUserDao){
+                assertTrue(((SQLUserDao)uDao).checkPassword(uDao.getUser("Catsi"),user.password()));
+            }else {
+                assertEquals(user, uDao.getUser("Catsi"));
+            }
         }
 
         @Test
