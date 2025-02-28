@@ -26,7 +26,19 @@ public class UserService {
         return aDao != null;
     }
 
-    boolean verifyAuth(String authToken, AuthDao aDao) throws DataAccessException {
+    static void authorizeToken(String authToken, AuthDao aDao) throws DataAccessException, AuthorizationException {
+        if(aDao instanceof SQLAuthDao){
+            try{
+                verifyAuth(authToken,aDao);
+            }catch(DataAccessException e){
+                throw new AuthorizationException("Error: unauthorized");
+            }
+        }else{
+            if(!verifyAuth(authToken,aDao)){throw new AuthorizationException("Error: unauthorized");}
+        }
+    }
+
+    static boolean verifyAuth(String authToken, AuthDao aDao) throws DataAccessException {
         if(authToken == null){return false;}
         if(aDao == null){return false;}
         AuthData aData = aDao.getAuth(authToken);
@@ -96,15 +108,7 @@ public class UserService {
     public LogoutResult logout(LogoutRequest r, AuthDao aDao) throws DataAccessException {
         //Verify authToken
         if(!(verifyDao(aDao))){throw new DaoException("Error: Database is null");}
-        if(aDao instanceof SQLAuthDao){
-            try{
-                verifyAuth(r.authToken(),aDao);
-            }catch(DataAccessException e){
-                throw new AuthorizationException("Error: unauthorized");
-            }
-        }else{
-            if(!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}
-        }
+        authorizeToken(r.authToken(),aDao);
         //Deleting the authData object
         AuthData auth = aDao.getAuth(r.authToken());
         aDao.deleteAuth(auth);

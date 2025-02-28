@@ -8,7 +8,6 @@ import model.*;
 
 import java.util.Collection;
 
-
 public class GameService {
     boolean verifyJoinInput(String color, int gameID){
         if(color == null){return false;}
@@ -26,22 +25,30 @@ public class GameService {
         return gDao != null;
     }
 
-    boolean verifyAuth(String authToken, AuthDao aDao) throws DataAccessException {
-        if(authToken == null){return false;}
-        if(aDao == null){return false;}
-        AuthData aData = aDao.getAuth(authToken);
-        return aData != null;
+    boolean verifyInput(AuthDao aDao, GameDao gDao, String authToken) throws DataAccessException, DaoException, AuthorizationException {
+        if(!verifyDao(aDao)){throw new DaoException("Error: Database is null");}
+        if(!verifyDao(gDao)){throw new DaoException("Error: Database is null");}
+        //Validate authToken
+        UserService.authorizeToken(authToken,aDao);
+        return true;
     }
 
     public CreateResult create(CreateRequest r,AuthDao aDao, GameDao gDao) throws DataAccessException {
         //Verify input
         if(r.gameName()==null){throw new InputException("Error: bad request");}
-        if(!verifyDao(aDao)){throw new DaoException("Error: Database is null");}
-        if(!verifyDao(gDao)){throw new DaoException("Error: Database is null");}
-        //Validate authToken
-        if(!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}
+        verifyInput(aDao,gDao,r.authToken());
         //Check gameName isn't already taken (optional)
-        if(gDao.getGame(r.gameName()) != null){throw new DuplicateException("Error: already taken");}
+        if(gDao instanceof SQLGameDao){
+            try{
+                gDao.getGame(r.gameName());
+                throw new DuplicateException("Error: already taken");
+            }catch(DataAccessException e){
+                //continue
+            }
+        }else{
+            if(gDao.getGame(r.gameName()) != null){throw new DuplicateException("Error: already taken");}
+        }
+
         //Create new game (automatically inserted into database)
         //(You don't automatically join game upon creation)
         GameData game = gDao.createGame(r.gameName());
@@ -51,10 +58,7 @@ public class GameService {
     public JoinResult join(JoinRequest r, AuthDao aDao, GameDao gDao) throws DataAccessException {
         //Verify input
         if (!verifyJoinInput(r.playerColor(),r.gameID())){throw new InputException("Error: bad request");}
-        if(!verifyDao(aDao)){throw new DaoException("Error: Database is null");}
-        if(!verifyDao(gDao)){throw new DaoException("Error: Database is null");}
-        //Validate authToken [getAuth() must not return null]
-        if (!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}
+        verifyInput(aDao,gDao,r.authToken());
         //Get game based upon GameID [getGame(gameID)] (also make sure it exists)
         GameData game = gDao.getGame(r.gameID());
         //Check that requested color isn't taken using Game you got
@@ -78,10 +82,7 @@ public class GameService {
     }
     public ListResult list(ListRequest r, AuthDao aDao, GameDao gDao) throws DataAccessException {
         //Validate Input
-        if(!verifyDao(aDao)){throw new DaoException("Error: Database is null");}
-        if(!verifyDao(gDao)){throw new DaoException("Error: Database is null");}
-        //Validate authToken [getAuth() must not return null]
-        if(!verifyAuth(r.authToken(),aDao)){throw new AuthorizationException("Error: unauthorized");}
+        verifyInput(aDao,gDao,r.authToken());
         //Get all the games [getAllGames()]
         Collection<GameData> allGames = gDao.getAllGames();
         //Return ListResult

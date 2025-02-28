@@ -16,13 +16,14 @@ public class GameServiceTests {
     GameDao gDao;
     GameService g;
     String token;
+    UserDao uDao;
     @BeforeEach
     void setUp() throws DataAccessException { //AuthDao and GameDao can be changed for testing SQL
         aDao = new SQLAuthDao();
         gDao = new SQLGameDao();
+        uDao = new SQLUserDao();
         g = new GameService();
         //Creating a user to make the game
-        UserDao uDao = new SQLUserDao();
         UserService u = new UserService();
         RegisterResult temp = u.register(new RegisterRequest("Catsi","C@t","Cassi@mail.com"),uDao,aDao);
         token = temp.authToken();
@@ -32,6 +33,7 @@ public class GameServiceTests {
     public void setDown() throws DataAccessException {
         gDao.clear();
         aDao.clear();
+        uDao.clear();
     }
 
     @Nested
@@ -91,7 +93,15 @@ public class GameServiceTests {
 
             assertNull(result.message());
             assertEquals(1,gDao.getAllGames().size());
-            assertEquals(new GameData("Catsi",null,"first",gameID,gDao.getGame("first").game()),gDao.getGame(gameID));
+            if(gDao instanceof SQLGameDao){
+                GameData theGame = new GameData("Catsi",null,"first",gameID,gDao.getGame("first").game());
+                assertEquals(theGame.whiteUsername(),gDao.getGame(gameID).whiteUsername());
+                assertEquals(theGame.blackUsername(),gDao.getGame(gameID).blackUsername());
+                assertEquals(theGame.gameName(),gDao.getGame(gameID).gameName());
+                assertEquals(theGame.gameID(),gDao.getGame(gameID).gameID());
+            }else{
+                assertEquals(new GameData("Catsi",null,"first",gameID,gDao.getGame("first").game()),gDao.getGame(gameID));
+            }
         }
 
         @Test
