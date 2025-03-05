@@ -1,8 +1,13 @@
 package client;
 
 import org.junit.jupiter.api.*;
+import requests.*;
+import results.*;
 import server.Server;
+import ui.ResponseException;
 import ui.ServerFacade;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -26,52 +31,67 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void testRegisterPass(){}
+    void testRegisterPass() throws ResponseException {
+        RegisterResult r = facade.register(new RegisterRequest("Catsi","cat","cat@mail.com"));
+        assertNotNull(r.authToken());
+        assertEquals("Catsi",r.username());
+        assertNull(r.message());
+    }
 
     @Test
-    void testRegisterFail(){}
+    void testRegisterFailEmailNull() throws ResponseException {
+        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest("Catsi","cat",null)));
+    }
 
     @Test
-    void testLoginPass(){}
+    void testRegisterFailUsernameNull() throws ResponseException {
+        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest(null,"cat","cat@mail.com")));
+    }
 
     @Test
-    void testLoginFail(){}
+    void testRegisterFailPasswordNull() throws ResponseException {
+        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest("Catsi",null,"cat@mail.com")));
+    }
 
     @Test
-    void testLogoutPass(){}
+    void testRegisterFailUsernameTaken() throws ResponseException {
+        facade.register(new RegisterRequest("Catsi","cat","cat@mail.com"));
+        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest("Catsi","dog","dog@mail.com")));
+    }
 
     @Test
-    void testLogoutFail(){}
+    void testLoginPass() throws ResponseException {}
 
     @Test
-    void testCreatePass(){}
+    void testLoginFail() throws ResponseException {}
 
     @Test
-    void testCreateFail(){}
+    void testLogoutPass() throws ResponseException {}
 
     @Test
-    void testListPass(){}
+    void testLogoutFail() throws ResponseException {}
 
     @Test
-    void testListFail(){}
+    void testCreatePass() throws ResponseException {}
 
     @Test
-    void testJoinPass(){}
+    void testCreateFail() throws ResponseException {}
 
     @Test
-    void testJoinFail(){}
+    void testListPass() throws ResponseException {}
 
     @Test
-    void testClearPass(){}
+    void testListFail() throws ResponseException {}
+
+    @Test
+    void testJoinPass() throws ResponseException {}
+
+    @Test
+    void testJoinFail() throws ResponseException {}
+
+    @Test
+    void testClearPass() throws ResponseException {}
 
     //@Test
     //void testClearFail(){}   <- I don't know if this is required
-
-    //Example:
-//    @Test
-//    void register() throws Exception {
-//        var authData = facade.register("player1", "password", "p1@email.com");
-//        assertTrue(authData.authToken().length() > 10);
-//    }
-
 }
