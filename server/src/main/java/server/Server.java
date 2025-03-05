@@ -58,6 +58,15 @@ public class Server {
         return Spark.port();
     }
 
+    public void clear(){
+        ClearService serv = new ClearService();
+        try {
+            serv.clear(uDao, aDao, gDao);
+        }catch(Exception e){
+            System.out.println("Failed to clear.");
+        }
+    }
+
     private Object addToken(Object request, String token){
         //Takes a Request without an auth token and adds it
         if(request instanceof JoinRequest){

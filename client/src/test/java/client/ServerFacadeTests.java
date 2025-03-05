@@ -25,10 +25,16 @@ public class ServerFacadeTests {
         facade = new ServerFacade(port);
     }
 
+    @AfterEach
+    void clearServer(){
+        server.clear();
+    }
+
     @AfterAll
     static void stopServer() {
         server.stop();
     }
+    //Note: Dao's are not cleared when server stops
 
     @Test
     void testRegisterPass() throws ResponseException {
@@ -40,17 +46,32 @@ public class ServerFacadeTests {
 
     @Test
     void testRegisterFailEmailNull() throws ResponseException {
-        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest("Catsi","cat",null)));
+        try{
+            facade.register(new RegisterRequest("Catsi","cat",null));
+            fail();
+        }catch(ResponseException e){
+            assertEquals(500,e.getStatusCode());
+        }
     }
 
     @Test
     void testRegisterFailUsernameNull() throws ResponseException {
-        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest(null,"cat","cat@mail.com")));
+        try{
+            facade.register(new RegisterRequest(null,"cat","cat@mail.com"));
+            fail();
+        }catch(ResponseException e){
+            assertEquals(500,e.getStatusCode());
+        }
     }
 
     @Test
     void testRegisterFailPasswordNull() throws ResponseException {
-        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest("Catsi",null,"cat@mail.com")));
+        try{
+            facade.register(new RegisterRequest("Catsi",null,"cat@mail.com"));
+            fail();
+        }catch(ResponseException e){
+            assertEquals(500,e.getStatusCode());
+        }
     }
 
     @Test
