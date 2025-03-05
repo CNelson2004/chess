@@ -24,6 +24,7 @@ public class ServerFacadeTests {
         facade = new ServerFacade(port);
     }
 
+    @BeforeEach
     @AfterEach
     void clearServer(){
         server.clear();
@@ -84,16 +85,35 @@ public class ServerFacadeTests {
 
     @Nested
     class LoginLogoutTests{
+        RegisterResult res;
+        String token;
         @BeforeEach
-        void setUp(){
-
+        void setUp() throws ResponseException {
+            res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
         }
 
         @Test
-        void testLoginPass() throws ResponseException {}
+        void testLoginPass() throws ResponseException {
+            LoginResult r = facade.login(new LoginRequest("Catsi", "cat"));
+            assertEquals("Catsi",r.username());
+            assertNull(r.message());
+            assertNotNull(r.authToken());
+        }
 
         @Test
-        void testLoginFail() throws ResponseException {}
+        void testLoginFailUsernameNull() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.login(new LoginRequest(null,"cat")));
+        }
+
+        @Test
+        void testLoginFailPasswordNull() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.login(new LoginRequest("Catsi","null")));
+        }
+
+        @Test
+        void testLoginFailBadPassword() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.login(new LoginRequest("Catsi","dog")));
+        }
 
         @Test
         void testLogoutPass() throws ResponseException {}
@@ -106,7 +126,7 @@ public class ServerFacadeTests {
     @Nested
     class CreateTests{
         @BeforeEach
-        void setUp(){
+        void setUp() throws ResponseException {
 
         }
 
@@ -121,7 +141,7 @@ public class ServerFacadeTests {
     @Nested
     class ListJoinTests{
         @BeforeEach
-        void setUp(){
+        void setUp() throws ResponseException {
 
         }
 
