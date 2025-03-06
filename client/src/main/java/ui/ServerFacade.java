@@ -51,9 +51,13 @@ public class ServerFacade {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
-            http.setDoOutput(true);
-
-            writeBody(request, http);
+            if (!(request instanceof RegisterRequest || request instanceof LoginRequest)){
+                writeHeader(request,http);
+            }
+            if(!(method.equals("GET"))){
+                http.setDoOutput(true);
+                writeBody(request, http);
+            }
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
@@ -66,13 +70,17 @@ public class ServerFacade {
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
-            if (!(request instanceof RegisterRequest || request instanceof LoginRequest)){
-                writeHeader(request,http);
-            }
-            else{http.addRequestProperty("Content-Type", "application/json");}
-            String reqData = new Gson().toJson(request);
-            try (OutputStream reqBody = http.getOutputStream()) {
-                reqBody.write(reqData.getBytes());
+            //changed
+            if(!(http.getRequestMethod().equals("GET"))){
+                http.addRequestProperty("Content-Type", "application/json");
+                String reqData = new Gson().toJson(request);
+                try (OutputStream reqBody = http.getOutputStream()) {
+                    reqBody.write(reqData.getBytes());
+                }
+            }else{
+                try (OutputStream reqBody = http.getOutputStream()) {
+                    reqBody.write(new byte[0]);
+                }
             }
         }
     }
@@ -85,11 +93,12 @@ public class ServerFacade {
         else if(request instanceof JoinRequest){token = ((JoinRequest) request).authToken();}
         else if(request instanceof ListRequest){token = ((ListRequest) request).authToken();}
         if (request != null) {
-            http.addRequestProperty("authorization", token);
-            String reqData = new Gson().toJson(request);
-            try (OutputStream reqBody = http.getOutputStream()) {
-                reqBody.write(reqData.getBytes());
-            }
+            http.addRequestProperty("Authorization", token);
+            //Remove below
+            //String reqData = new Gson().toJson(request);
+            //try (OutputStream reqBody = http.getOutputStream()) {
+            //    reqBody.write(reqData.getBytes());
+            //}
         }
     }
 

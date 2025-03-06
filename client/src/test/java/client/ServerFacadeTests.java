@@ -172,7 +172,7 @@ public class ServerFacadeTests {
     }
 
     @Nested
-    class ListJoinTests{
+    class ListJoinClearTests{
         int id;
 
         @BeforeEach
@@ -184,14 +184,24 @@ public class ServerFacadeTests {
         }
 
         @Test
-        void testListPass() throws ResponseException {
-            //ListResult r = facade.list(new ListRequest(token));
-            //assertNull(r.message());
-            //assertEquals(1,r.games().size());
+        void testListPassOneGame() throws ResponseException {
+            ListResult r = facade.list(new ListRequest(token));
+            assertNull(r.message());
+            assertEquals(1,r.games().size());
         }
 
         @Test
-        void testListFail() throws ResponseException {}
+        void testListPassTwoGames() throws ResponseException {
+            facade.create(new CreateRequest("secondName",token));
+            ListResult r = facade.list(new ListRequest(token));
+            assertNull(r.message());
+            assertEquals(2,r.games().size());
+        }
+
+        @Test
+        void testListFail() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.list(new ListRequest(null)));
+        }
 
         @Test
         void testJoinPassWhite() throws ResponseException {
@@ -241,7 +251,8 @@ public class ServerFacadeTests {
         }
 
         @Test
-        void testClearPass() throws ResponseException {}
+        void testClearPass() throws ResponseException {
+        }
 
     }
 }

@@ -46,6 +46,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here
+        Spark.before("*", this::filter);
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
@@ -56,6 +57,12 @@ public class Server {
 
         Spark.awaitInitialization();
         return Spark.port();
+    }
+
+    private void filter(Request req, Response res){
+        String urlLine = req.url();
+        var headers = req.headers();
+        String method = req.requestMethod();
     }
 
     public void clear(){
