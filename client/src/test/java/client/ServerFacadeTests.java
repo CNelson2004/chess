@@ -15,6 +15,7 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade facade;
+    String token;
 
     @BeforeAll
     public static void init() {
@@ -85,8 +86,6 @@ public class ServerFacadeTests {
 
     @Nested
     class LoginLogoutTests{
-        String token;
-
         @BeforeEach
         void setUp() throws ResponseException {
             RegisterResult res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
@@ -136,8 +135,6 @@ public class ServerFacadeTests {
 
     @Nested
     class CreateTests{
-        String token;
-
         @BeforeEach
         void setUp() throws ResponseException {
             RegisterResult res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
@@ -176,28 +173,75 @@ public class ServerFacadeTests {
 
     @Nested
     class ListJoinTests{
+        int id;
+
         @BeforeEach
         void setUp() throws ResponseException {
-
+            RegisterResult res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
+            token = res.authToken();
+            CreateResult cres = facade.create(new CreateRequest("theName",token));
+            id = cres.gameID();
         }
 
         @Test
-        void testListPass() throws ResponseException {}
+        void testListPass() throws ResponseException {
+            //ListResult r = facade.list(new ListRequest(token));
+            //assertNull(r.message());
+            //assertEquals(1,r.games().size());
+        }
 
         @Test
         void testListFail() throws ResponseException {}
 
         @Test
-        void testJoinPass() throws ResponseException {}
+        void testJoinPassWhite() throws ResponseException {
+            JoinResult r = facade.join(new JoinRequest("WHITE",id,token));
+            assertNull(r.message());
+        }
 
         @Test
-        void testJoinFail() throws ResponseException {}
+        void testJoinPassBlack() throws ResponseException {
+            JoinResult r = facade.join(new JoinRequest("BLACK",id,token));
+            assertNull(r.message());
+        }
+
+        @Test
+        void testJoinFailNullColor() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.join(new JoinRequest(null,id,token)));
+        }
+
+        @Test
+        void testJoinFailNullAuthToken() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.join(new JoinRequest("WHITE",id,null)));
+        }
+
+        @Test
+        void testJoinFailBadColor() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.join(new JoinRequest("BLUE",id,token)));
+        }
+
+        @Test
+        void testJoinFailLowerCaseColor() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.join(new JoinRequest("white",id,token)));
+        }
+
+        @Test
+        void testJoinFailCapitalizedColor() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.join(new JoinRequest("White",id,token)));
+        }
+
+        @Test
+        void testJoinFailBadGameID() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.join(new JoinRequest("WHITE",54321,token)));
+        }
+
+        @Test
+        void testJoinFailBadAuthToken() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.join(new JoinRequest("WHITE",id,"12345")));
+        }
 
         @Test
         void testClearPass() throws ResponseException {}
-
-        //@Test
-        //void testClearFail(){}   <- I don't know if this is required
 
     }
 }
