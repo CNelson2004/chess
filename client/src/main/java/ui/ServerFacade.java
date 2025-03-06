@@ -18,43 +18,40 @@ public class ServerFacade {
     public RegisterResult register(RegisterRequest r) throws ResponseException {
         //Creates HTTP request and sends it to the server
         //Receives the result and processes it
-        return makeRequest("POST","/user",r,null,RegisterResult.class);
+        return makeRequest("POST","/user",r,RegisterResult.class);
     }
 
     public LoginResult login(LoginRequest r) throws ResponseException {
-        return makeRequest("POST","/session",r,null,LoginResult.class);
+        return makeRequest("POST","/session",r,LoginResult.class);
     }
 
     public LogoutResult logout(LogoutRequest r) throws ResponseException {
-        return makeRequest("DELETE","/session",null,r,LogoutResult.class);
+        return makeRequest("DELETE","/session",r,LogoutResult.class);
     }
 
     public CreateResult create(CreateRequest r) throws ResponseException {
-        return makeRequest("POST","/game",r,null,CreateResult.class); //change header from null
+        return makeRequest("POST","/game",r,CreateResult.class);
     }
 
     //double check this one (list is already blue)
     public ListResult list(ListRequest r) throws ResponseException {
-        return makeRequest("GET","/game",null,r,ListResult.class);
+        return makeRequest("GET","/game",r,ListResult.class);
     }
 
     public JoinResult join(JoinRequest r) throws ResponseException {
-        return makeRequest("PUT","/game",r,null,JoinResult.class); //change header from null
+        return makeRequest("PUT","/game",r,JoinResult.class);
     }
 
     public ClearResult clear() throws ResponseException {
-        return makeRequest("DELETE","/db",null,null,ClearResult.class);
+        return makeRequest("DELETE","/db",null,ClearResult.class);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Object header, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-
-            //if header isn't null call writeHeader
-            if(header != null){writeHeader(header,http);}
 
             writeBody(request, http);
             http.connect();
@@ -69,7 +66,10 @@ public class ServerFacade {
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
-            http.addRequestProperty("Content-Type", "application/json");
+            if (!(request instanceof RegisterRequest || request instanceof LoginRequest)){
+                writeHeader(request,http);
+            }
+            else{http.addRequestProperty("Content-Type", "application/json");}
             String reqData = new Gson().toJson(request);
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());

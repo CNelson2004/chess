@@ -85,11 +85,11 @@ public class ServerFacadeTests {
 
     @Nested
     class LoginLogoutTests{
-        RegisterResult res;
         String token;
+
         @BeforeEach
         void setUp() throws ResponseException {
-            res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
+            RegisterResult res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
             token = res.authToken();
         }
 
@@ -136,22 +136,41 @@ public class ServerFacadeTests {
 
     @Nested
     class CreateTests{
-        //RegisterResult res;
-        //String token;
+        String token;
 
         @BeforeEach
         void setUp() throws ResponseException {
-            //res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
-            //token = res.authToken();
+            RegisterResult res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
+            token = res.authToken();
         }
 
         @Test
         void testCreatePass() throws ResponseException {
-            //CreateResult r = facade.create(new CreateRequest("name",));
+            CreateResult r = facade.create(new CreateRequest("theName",token));
+            assertNull(r.message());
+            assertNotNull(r.gameID());
         }
 
         @Test
-        void testCreateFail() throws ResponseException {}
+        void testCreateFailNullGameName() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.create(new CreateRequest(null,token)));
+        }
+
+        @Test
+        void testCreateFailNullAuthToken() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.create(new CreateRequest("name",null)));
+        }
+
+        @Test
+        void testCreateFailBadAuthToken() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.create(new CreateRequest("name","12345")));
+        }
+
+        @Test
+        void testCreateFailSameGameName() throws ResponseException {
+            facade.create(new CreateRequest("theName",token));
+            assertThrows(ResponseException.class, () -> facade.create(new CreateRequest("theName",token)));
+        }
 
     }
 
