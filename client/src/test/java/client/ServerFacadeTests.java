@@ -252,6 +252,8 @@ public class ServerFacadeTests {
 
         @Test
         void testClearPass() throws ResponseException {
+            ClearResult r = facade.clear();
+            assertNull(r.message());
         }
 
     }
