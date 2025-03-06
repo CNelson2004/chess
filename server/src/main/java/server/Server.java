@@ -47,8 +47,8 @@ public class Server {
 
         // Register your endpoints and handle exceptions here
         Spark.delete("/db", this::clear);
-        Spark.post("/user", this::register); //Email of user must have @ and .com in it.
-        Spark.post("/session", this::login);    //Problem with getting authToken from req!!!
+        Spark.post("/user", this::register);
+        Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::list);
         Spark.post("/game", this::create);
@@ -142,7 +142,7 @@ public class Server {
 
     private Object logout(Request req,  Response res){
         UserService serv = new UserService();
-        LogoutRequest r = new LogoutRequest(req.headers("Authorization"));
+        LogoutRequest r = new LogoutRequest(req.headers("Authorization")); //headers don't care about capitalization (authorization == Authorization)
         try{
             LogoutResult result = serv.logout(r,aDao);
             res.type("application/json");

@@ -90,6 +90,7 @@ public class ServerFacadeTests {
         @BeforeEach
         void setUp() throws ResponseException {
             res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
+            token = res.authToken();
         }
 
         @Test
@@ -116,22 +117,38 @@ public class ServerFacadeTests {
         }
 
         @Test
-        void testLogoutPass() throws ResponseException {}
+        void testLogoutPass() throws ResponseException {
+            LogoutResult r = facade.logout(new LogoutRequest(token)); //For some reason headers is null when passing to logout in server
+            assertNull(r.message());
+        }
 
         @Test
-        void testLogoutFail() throws ResponseException {}
+        void testLogoutFailNullToken() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.logout(new LogoutRequest(null)));
+        }
+
+        @Test
+        void testLogoutFailInvalidToken() throws ResponseException {
+            assertThrows(ResponseException.class, () -> facade.logout(new LogoutRequest("12345")));
+        }
 
     }
 
     @Nested
     class CreateTests{
+        //RegisterResult res;
+        //String token;
+
         @BeforeEach
         void setUp() throws ResponseException {
-
+            //res = facade.register(new RegisterRequest("Catsi", "cat", "cat@mail.com"));
+            //token = res.authToken();
         }
 
         @Test
-        void testCreatePass() throws ResponseException {}
+        void testCreatePass() throws ResponseException {
+            //CreateResult r = facade.create(new CreateRequest("name",));
+        }
 
         @Test
         void testCreateFail() throws ResponseException {}
