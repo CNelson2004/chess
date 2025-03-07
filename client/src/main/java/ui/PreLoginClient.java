@@ -2,19 +2,15 @@ package ui;
 
 import java.util.Arrays;
 
-import com.google.gson.Gson;
-import com.sun.nio.sctp.NotificationHandler;
 import requests.*;
 import results.*;
 
-public class PreLoginClient {
+public class PreLoginClient implements EvalClient {
     private final ServerFacade server;
 
-    public PreLoginClient(int port) {
-        server = new ServerFacade(port);
-    }
+    public PreLoginClient(int port) {server = new ServerFacade(port);}
 
-    public String eval(String input) {
+    public String eval(String input) throws ResponseException{
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -34,15 +30,16 @@ public class PreLoginClient {
     public String login(String... params) throws ResponseException {
         LoginRequest r = new LoginRequest(params[0],params[1]);
         LoginResult res = server.login(r);
-        //transition to PostLoginUI?
-        return null;
+        //Setting authToken for the other methods
+        PostLoginClient.setToken(res.authToken());
+        return "Transitioning to main page";
     }
 
     public String register(String... params) throws ResponseException {
         RegisterRequest r = new RegisterRequest(params[0],params[1],params[2]);
         RegisterResult res = server.register(r);
-        //transition to PostLoginUI?
-        return null;
+        PostLoginClient.setToken(res.authToken());
+        return "Transitioning to main page";
     }
 
     public String help(){

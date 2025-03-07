@@ -1,13 +1,14 @@
 import chess.*;
+import ui.Repl;
 
 public class Main {
     public static void main(String[] args) {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        //var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        //System.out.println("♕ 240 Chess Client: " + piece);
+
+        //var serverUrl = "http://localhost:8080";
+        //if (args.length == 1) {serverUrl = args[0];}
+
+        new Repl(8080).run();
     }
-    //Pre login repl  {I don't yet know where these go}
-
-    //Post login repl
-
-    //Game repl (Phase 6)
 }
