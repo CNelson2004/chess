@@ -28,7 +28,7 @@ public class PreLoginClient implements EvalClient {
         } catch (ResponseException ex) {
             if(currentCMD.equals("login")){throw new ResponseException(500,"Incorrect password");}
             else if(currentCMD.equals("register")){throw new ResponseException(500,"Username already taken");}
-            else{return ex.getMessage();}
+            else{throw ex;}
         }
     }
 
@@ -41,15 +41,21 @@ public class PreLoginClient implements EvalClient {
         LoginRequest r = new LoginRequest(params[0],params[1]);
         LoginResult res = server.login(r);
         //Setting authToken for the other methods
-        PostLoginClient.setToken(res.authToken());
+        setVars(res.authToken(),res.username());
         return "Transitioning to main page";
     }
 
     public String register(String... params) throws ResponseException {
         RegisterRequest r = new RegisterRequest(params[0],params[1],params[2]);
         RegisterResult res = server.register(r);
-        PostLoginClient.setToken(res.authToken());
+        setVars(res.authToken(),res.username());
         return "Transitioning to main page";
+    }
+
+    private void setVars(String authToken,String username){
+        PostLoginClient.setToken(authToken);
+        PostLoginClient.setUsername(username);
+        GameClient.setUsername(username);
     }
 
     public String help(){

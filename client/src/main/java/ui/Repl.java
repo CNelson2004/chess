@@ -1,18 +1,6 @@
 package ui;
 
-//import client.websocket.NotificationHandler;
-//import webSocketMessages.Notification;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Random;
-
-import java.util.Arrays;
 import java.util.Scanner;
-
-import static chess.ChessPiece.PieceType.*;
-import static chess.ChessPiece.PieceType.ROOK;
-import static ui.EscapeSequences.*;
 
 public class Repl{
     private final PreLoginClient preUI;
@@ -58,7 +46,7 @@ public class Repl{
                 System.out.println(e.getMessage());
             }
             catch (ArrayIndexOutOfBoundsException e){
-                System.out.println("Incorrect number of parameters");
+                System.out.println("Incorrect parameters");
             }
         }
     }

@@ -4,16 +4,16 @@ import java.util.Arrays;
 
 public class GameClient implements EvalClient {
     private final ServerFacade server;
-    protected static String id;
     protected static String color;
+    protected static String username;
     private String currentCMD = "";
 
     public GameClient(int port) {
         server = new ServerFacade(port);
     }
 
-    public static void setId(String value){id = value;}
     public static void setColor(String value){color = value;}
+    public static void setUsername(String value){username = value;}
 
     public String eval(String input) throws ResponseException{
         //try {}
@@ -39,7 +39,7 @@ public class GameClient implements EvalClient {
         } else {
             System.out.print("Error occurred, couldn't find player color.");
         }
-        return "Board drawn.";
+        return "";
     }
 
     public String help(){

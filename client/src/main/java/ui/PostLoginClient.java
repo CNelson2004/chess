@@ -10,7 +10,8 @@ import java.util.HashMap;
 public class PostLoginClient implements EvalClient {
     private final ServerFacade server;
     protected static String token;
-    protected static HashMap<Integer,Integer> gameIndexes = new HashMap<Integer,Integer>();
+    protected static String username;
+    protected static HashMap<Integer,GameData> gameIndexes = new HashMap<Integer,GameData>();
     private String currentCMD = "";
 
     public PostLoginClient(int port) {
@@ -18,6 +19,7 @@ public class PostLoginClient implements EvalClient {
     }
 
     public static void setToken(String value){token = value;}
+    public static void setUsername(String value){username = value;}
 
     public static String getToken(){return token;}
 
@@ -38,15 +40,21 @@ public class PostLoginClient implements EvalClient {
                 default -> help();
             };
         } catch (ResponseException ex) {
-            if(currentCMD.equals("create")){throw new ResponseException(500,"Game name already taken");}
-            if(currentCMD.equals("join")){throw new ResponseException(500,"Unrecognized color");}
-            else{return ex.getMessage();}
+            if(currentCMD.equals("create")){
+                if(ex.getStatusCode()==400){throw new ResponseException(400,"Unrecognized game");}
+                else{throw new ResponseException(500,"Game name already taken");}
+            }
+            if(currentCMD.equals("join")){
+                if(ex.getStatusCode()==400){throw new ResponseException(400,"Unrecognized game");}
+                else{throw new ResponseException(500,"Cannot join as that color");}
+            }
+            else{throw ex;}
         }
     }
 
     public String create(String... params) throws ResponseException {
         CreateRequest r = new CreateRequest(params[0],token);
-        CreateResult res = server.create(r);
+        server.create(r);
         return "Your game has been created\n";
     }
 
@@ -60,18 +68,24 @@ public class PostLoginClient implements EvalClient {
         int i=1;
         for(GameData game : res.games()){
             allGames.append(String.format("%d-%s, White: %s, Black: %s\n",i,game.gameName(),game.whiteUsername(),game.blackUsername()));
-            gameIndexes.put(i,game.gameID());
+            gameIndexes.put(i,game);
             i++;
         }
         return allGames.toString();
     }
 
     public String join(String... params) throws ResponseException {
-        //int gameID = gameIndexes.get(params[0]); -> JoinRequest r = new JoinRequest(params[1],gameID,token); -> server.join(r);
-        // -> GameClient.setId(params[0]); -> GameClient.setColor(params[1]);
+        int id = -1;
+        try{id = Integer.parseInt(params[0]);}
+        catch(Exception e){throw new ArrayIndexOutOfBoundsException();}
+        if(!(gameIndexes.containsKey(id))){throw new ResponseException(400,"Unrecognized game");}
+        int gameID = gameIndexes.get(id).gameID();
+        JoinRequest r = new JoinRequest(params[1].toUpperCase(),gameID,token);
+        server.join(r);
+        GameClient.setColor(params[1].toUpperCase());
+        //Checking if index is valid
         if(params[1].equalsIgnoreCase("WHITE")){GameClient.color = "WHITE";}
         else if(params[1].equalsIgnoreCase("BLACK")){GameClient.color = "BLACK";}
-        else{throw new ResponseException(500,"Unrecognized color");}
         return "Transitioning to game page";
     }
 
