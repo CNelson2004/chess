@@ -2,9 +2,17 @@ package ui;
 
 //import client.websocket.NotificationHandler;
 //import webSocketMessages.Notification;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Random;
 
 import java.util.Arrays;
 import java.util.Scanner;
+
+import static chess.ChessPiece.PieceType.*;
+import static chess.ChessPiece.PieceType.ROOK;
+import static ui.EscapeSequences.*;
 
 public class Repl{
     private final PreLoginClient preUI;
@@ -29,21 +37,21 @@ public class Repl{
             String line = scanner.nextLine();
             try{
                 result = currentUI.eval(line);
-                System.out.print(result);
-                System.out.println("\n");
                 switch (result) {
-                    case "Transitioning to main page" -> {
+                    case "Transitioning to main page":
                         currentUI = postUI;
                         System.out.println(currentUI.help());
-                    }
-                    case "Transitioning to login page" -> {
+                        break;
+                    case "Transitioning to login page":
                         currentUI = preUI;
                         System.out.println(currentUI.help());
-                    }
-                    case "Transitioning to game page" -> {
+                        break;
+                    case "Transitioning to game page":
                         currentUI = gameUI;
-                        System.out.println(currentUI.help());
-                    }
+                        System.out.println(gameUI.draw()); //swtich back to currentUI.help()
+                        break;
+                    default:
+                        System.out.print(result);
                 }
             } catch(ResponseException e){
                 String message = e.toString();

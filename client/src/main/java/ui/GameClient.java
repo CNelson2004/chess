@@ -5,19 +5,42 @@ import java.util.Arrays;
 public class GameClient implements EvalClient {
     private final ServerFacade server;
     protected static String id;
+    protected static String color;
 
     public GameClient(int port) {
         server = new ServerFacade(port);
     }
 
     public static void setId(String value){id = value;}
-    //When a player joins the game draw the board from the black or white perspective
+    public static void setColor(String value){color = value;}
 
     public String eval(String input) throws ResponseException{
-        return null;
+        var tokens = input.toLowerCase().split(" ");
+        var cmd = (tokens.length > 0) ? tokens[0] : "help";
+        var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+        return switch (cmd) {
+            case "quit" -> "quit";
+            case "draw" -> draw();
+            case "back" -> "Transitioning to main page";
+            default -> help();
+        };
+
+        //waiting for next phase
+    }
+
+    public String draw(){
+        if (color.equals("WHITE")) {
+            Draw.drawBoard();
+        } else if (color.equals("BLACK")) {
+            Draw.drawBoardBlack();
+        } else {
+            System.out.print("Error occurred, couldn't find player color.");
+        }
+        return "Board drawn.";
     }
 
     public String help(){
-        return null;
+        return "help pending...";
     }
 }

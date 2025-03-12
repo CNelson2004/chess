@@ -19,12 +19,18 @@ public class PreLoginClient implements EvalClient {
             return switch (cmd) {
                 case "login" -> login(params);
                 case "register" -> register(params);
+                case "clear" -> clear();
                 case "quit" -> "quit";
                 default -> help();
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    public String clear() throws ResponseException{
+        server.clear();
+        return "Server cleared\n";
     }
 
     public String login(String... params) throws ResponseException {

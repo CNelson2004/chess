@@ -5,10 +5,12 @@ import requests.*;
 import results.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class PostLoginClient implements EvalClient {
     private final ServerFacade server;
     protected static String token;
+    protected static HashMap<Integer,Integer> gameIndexes = new HashMap<Integer,Integer>();;
 
     public PostLoginClient(int port) {
         server = new ServerFacade(port);
@@ -43,7 +45,7 @@ public class PostLoginClient implements EvalClient {
         CreateRequest r = new CreateRequest(params[0],token);
         CreateResult res = server.create(r);
         //return string saying you created the game
-        return String.format("Your game has been created with ID:%d", res.gameID());
+        return String.format("Your game has been created with ID:%d\n", res.gameID());
     }
 
     public String list() throws ResponseException {
@@ -51,25 +53,35 @@ public class PostLoginClient implements EvalClient {
         ListResult res = server.list(r);
         //return list of all the games (w/ index number next to game name next to current player names (null if color not taken)
         StringBuilder allGames = new StringBuilder();
+        gameIndexes.clear();
+        int i=1;
         for(GameData game : res.games()){
-            allGames.append(String.format("Game ID: %d, Game Name: %s, White: %s, Black: %s\n",game.gameID(),game.gameName(),game.whiteUsername(),game.blackUsername()));
+            allGames.append(String.format("%d-%s, White: %s, Black: %s\n",i,game.gameName(),game.whiteUsername(),game.blackUsername()));
+            gameIndexes.put(i,game.gameID());
+            i++;
         }
         return allGames.toString();
     }
 
     public String join(String... params) throws ResponseException {
-        JoinRequest r = new JoinRequest(params[1],Integer.parseInt(params[0]),token);
-        server.join(r);
-        GameClient.setId(params[0]);
+        //int gameID = gameIndexes.get(params[0]);
+//        JoinRequest r = new JoinRequest(params[1],gameID,token);
+//        server.join(r);
+//        GameClient.setId(params[0]);
+//        GameClient.setColor(params[1]);
+        if(params[1].equalsIgnoreCase("WHITE")){GameClient.color = "WHITE";}
+        else if(params[1].equalsIgnoreCase("BLACK")){GameClient.color = "BLACK";}
+        else{System.out.print("Sorry, player color lost.\n");}
         return "Transitioning to game page";
     }
 
     public String observe(String... params) throws ResponseException {
-        //Join game except you switch to special client where you can't make moves?
-        //You view from white's side
-        JoinRequest r = new JoinRequest(params[1],Integer.parseInt(params[0]),token);
-        server.join(r);
-        GameClient.setId(params[0]);
+        //Join game except you switch to game you can't make moves
+//        JoinRequest r = new JoinRequest("WHITE",Integer.parseInt(params[0]),token);
+//        server.join(r);
+//        GameClient.setId(params[0]);
+//        GameClient.setColor(params[1]);
+        GameClient.color = "WHITE";
         return "Transitioning to game page";
     }
 
