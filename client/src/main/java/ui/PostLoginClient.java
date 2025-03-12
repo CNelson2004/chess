@@ -90,6 +90,13 @@ public class PostLoginClient implements EvalClient {
     }
 
     public String observe(String... params) throws ResponseException {
+        //checking for errors
+        int id = -1;
+        try{id = Integer.parseInt(params[0]);}
+        catch(Exception e){throw new ArrayIndexOutOfBoundsException();}
+        if(!(gameIndexes.containsKey(id))){throw new ResponseException(400,"Unrecognized game");}
+        //make sure you only have the one parameter
+        if(!(params.length==1)){throw new ArrayIndexOutOfBoundsException();}
         GameClient.color = "WHITE";
         return "Transitioning to game page";
     }
