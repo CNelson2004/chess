@@ -48,14 +48,14 @@ public class Repl{
                         break;
                     case "Transitioning to game page":
                         currentUI = gameUI;
-                        System.out.println(gameUI.draw()); //swtich back to currentUI.help()
+                        System.out.println(currentUI.help());
+                        System.out.println(gameUI.draw()); //delete after phase 5 complete
                         break;
                     default:
                         System.out.print(result);
                 }
             } catch(ResponseException e){
                 System.out.println(e.getMessage());
-                System.out.println();
             }
             catch (ArrayIndexOutOfBoundsException e){
                 System.out.println("Incorrect number of parameters");

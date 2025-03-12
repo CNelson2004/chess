@@ -6,11 +6,6 @@ import java.nio.charset.StandardCharsets;
 import static ui.EscapeSequences.*;
 
 public class Draw {
-//    public static void main(String[] args){
-//        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-//        drawBoard();
-//    }
-
     public static void drawBoard(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);

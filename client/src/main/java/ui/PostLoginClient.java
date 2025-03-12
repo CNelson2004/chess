@@ -25,10 +25,11 @@ public class PostLoginClient implements EvalClient {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            currentCMD = cmd;
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
-                case "create" -> create(params); //catch errror if game name is the same
+                case "create" -> create(params);
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
@@ -44,11 +45,9 @@ public class PostLoginClient implements EvalClient {
     }
 
     public String create(String... params) throws ResponseException {
-        //get authentication token from the user using eval?
         CreateRequest r = new CreateRequest(params[0],token);
         CreateResult res = server.create(r);
-        //return string saying you created the game
-        return "Your game has been created";
+        return "Your game has been created\n";
     }
 
     public String list() throws ResponseException {
@@ -68,24 +67,15 @@ public class PostLoginClient implements EvalClient {
     }
 
     public String join(String... params) throws ResponseException {
-        //int gameID = gameIndexes.get(params[0]);
-//        JoinRequest r = new JoinRequest(params[1],gameID,token);
-//        server.join(r);
-//        GameClient.setId(params[0]);
-//        GameClient.setColor(params[1]);
+        //int gameID = gameIndexes.get(params[0]); -> JoinRequest r = new JoinRequest(params[1],gameID,token); -> server.join(r);
+        // -> GameClient.setId(params[0]); -> GameClient.setColor(params[1]);
         if(params[1].equalsIgnoreCase("WHITE")){GameClient.color = "WHITE";}
         else if(params[1].equalsIgnoreCase("BLACK")){GameClient.color = "BLACK";}
         else{throw new ResponseException(500,"Unrecognized color");}
-        //else{System.out.print("Sorry, player color lost.\n");}
         return "Transitioning to game page";
     }
 
     public String observe(String... params) throws ResponseException {
-        //Join game except you switch to game you can't make moves
-//        JoinRequest r = new JoinRequest("WHITE",Integer.parseInt(params[0]),token);
-//        server.join(r);
-//        GameClient.setId(params[0]);
-//        GameClient.setColor(params[1]);
         GameClient.color = "WHITE";
         return "Transitioning to game page";
     }

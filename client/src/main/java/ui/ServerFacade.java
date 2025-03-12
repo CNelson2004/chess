@@ -70,7 +70,6 @@ public class ServerFacade {
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
-            //changed
             if(!(http.getRequestMethod().equals("GET"))){
                 http.addRequestProperty("Content-Type", "application/json");
                 String reqData = new Gson().toJson(request);
@@ -94,11 +93,6 @@ public class ServerFacade {
         else if(request instanceof ListRequest){token = ((ListRequest) request).authToken();}
         if (request != null) {
             http.addRequestProperty("Authorization", token);
-            //Remove below
-            //String reqData = new Gson().toJson(request);
-            //try (OutputStream reqBody = http.getOutputStream()) {
-            //    reqBody.write(reqData.getBytes());
-            //}
         }
     }
 

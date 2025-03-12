@@ -19,8 +19,8 @@ public class PreLoginClient implements EvalClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
-                case "login" -> login(params); //catch login error when logging in with wrong password
-                case "register" -> register(params); //catch register error when registering same name twice
+                case "login" -> login(params);
+                case "register" -> register(params);
                 case "clear" -> clear();
                 case "quit" -> "quit";
                 default -> help();  //Change from default being help to "Unrecognized parameters?"

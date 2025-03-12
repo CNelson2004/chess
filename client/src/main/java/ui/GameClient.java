@@ -27,9 +27,7 @@ public class GameClient implements EvalClient {
                 case "back" -> "Transitioning to main page";
                 default -> help();
             };
-
         //catch{}
-
         //waiting for next phase
     }
 
@@ -45,6 +43,10 @@ public class GameClient implements EvalClient {
     }
 
     public String help(){
-        return "help pending...";
+        return """
+                * back - return to main screen
+                * help - list commands
+                * quit - exit
+                """;
     }
 }
