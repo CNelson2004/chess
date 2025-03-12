@@ -46,7 +46,6 @@ public class GameClient implements EvalClient {
         return """
                 * back - return to main screen
                 * help - list commands
-                * quit - exit
                 """;
     }
 }
