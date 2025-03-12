@@ -27,31 +27,33 @@ public class Draw {
 
     private static void drawChessBoard(PrintStream out){
         //draw letters at the top
-        printLetters(out);
+        printLetters(out,true);
         //draw rows
         for(int row=8;row>0;row--){
             drawRow(out, row);
         }
         //draw letters at the bottom
-        printLetters(out);
+        printLetters(out,true);
     }
 
     private static void drawChessBoardBackwards(PrintStream out){
         //draw letters at the top
-        printLetters(out);
+        printLetters(out,false);
         //draw rows
         for(int row=1;row<9;row++){
             drawRow(out, row);
         }
         //draw letters at the bottom
-        printLetters(out);
+        printLetters(out,false);
     }
 
-    private static void printLetters(PrintStream out){
+    private static void printLetters(PrintStream out, boolean forward){
         out.print(SET_BG_COLOR_DARK_BROWN);
         out.print(SET_TEXT_COLOR_BLACK);
         out.print(" ".repeat(3));
-        String[] lineup = new String[]{"a ","b ","c ","d ","e ","f ","g ","h "};
+        String[] lineup;
+        if(forward){lineup = new String[]{"a ","b ","c ","d ","e ","f ","g ","h "};}
+        else{lineup = new String[]{"h ","g ","f ","e ","d ","c ","b ","a "};}
         for(int col=0;col<8;col++){
             out.print(TRUE_EMPTY);
             out.print(lineup[col]);

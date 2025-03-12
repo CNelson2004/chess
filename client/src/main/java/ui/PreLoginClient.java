@@ -7,6 +7,7 @@ import results.*;
 
 public class PreLoginClient implements EvalClient {
     private final ServerFacade server;
+    private String currentCMD = "";
 
     public PreLoginClient(int port) {server = new ServerFacade(port);}
 
@@ -14,17 +15,20 @@ public class PreLoginClient implements EvalClient {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            currentCMD = cmd;
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
-                case "login" -> login(params);
-                case "register" -> register(params);
+                case "login" -> login(params); //catch login error when logging in with wrong password
+                case "register" -> register(params); //catch register error when registering same name twice
                 case "clear" -> clear();
                 case "quit" -> "quit";
-                default -> help();
+                default -> help();  //Change from default being help to "Unrecognized parameters?"
             };
         } catch (ResponseException ex) {
-            return ex.getMessage();
+            if(currentCMD.equals("login")){throw new ResponseException(500,"Incorrect password");}
+            else if(currentCMD.equals("register")){throw new ResponseException(500,"Username already taken");}
+            else{return ex.getMessage();}
         }
     }
 

@@ -54,8 +54,11 @@ public class Repl{
                         System.out.print(result);
                 }
             } catch(ResponseException e){
-                String message = e.toString();
-                System.out.print(message);
+                System.out.println(e.getMessage());
+                System.out.println();
+            }
+            catch (ArrayIndexOutOfBoundsException e){
+                System.out.println("Incorrect number of parameters");
             }
         }
     }

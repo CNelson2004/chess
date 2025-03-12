@@ -6,6 +6,7 @@ public class GameClient implements EvalClient {
     private final ServerFacade server;
     protected static String id;
     protected static String color;
+    private String currentCMD = "";
 
     public GameClient(int port) {
         server = new ServerFacade(port);
@@ -15,16 +16,19 @@ public class GameClient implements EvalClient {
     public static void setColor(String value){color = value;}
 
     public String eval(String input) throws ResponseException{
-        var tokens = input.toLowerCase().split(" ");
-        var cmd = (tokens.length > 0) ? tokens[0] : "help";
-        var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+        //try {}
+            var tokens = input.toLowerCase().split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
-        return switch (cmd) {
-            case "quit" -> "quit";
-            case "draw" -> draw();
-            case "back" -> "Transitioning to main page";
-            default -> help();
-        };
+            return switch (cmd) {
+                case "quit" -> "quit";
+                case "draw" -> draw();
+                case "back" -> "Transitioning to main page";
+                default -> help();
+            };
+
+        //catch{}
 
         //waiting for next phase
     }

@@ -10,7 +10,8 @@ import java.util.HashMap;
 public class PostLoginClient implements EvalClient {
     private final ServerFacade server;
     protected static String token;
-    protected static HashMap<Integer,Integer> gameIndexes = new HashMap<Integer,Integer>();;
+    protected static HashMap<Integer,Integer> gameIndexes = new HashMap<Integer,Integer>();
+    private String currentCMD = "";
 
     public PostLoginClient(int port) {
         server = new ServerFacade(port);
@@ -27,7 +28,7 @@ public class PostLoginClient implements EvalClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
-                case "create" -> create(params);
+                case "create" -> create(params); //catch errror if game name is the same
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
@@ -36,7 +37,9 @@ public class PostLoginClient implements EvalClient {
                 default -> help();
             };
         } catch (ResponseException ex) {
-            return ex.getMessage();
+            if(currentCMD.equals("create")){throw new ResponseException(500,"Game name already taken");}
+            if(currentCMD.equals("join")){throw new ResponseException(500,"Unrecognized color");}
+            else{return ex.getMessage();}
         }
     }
 
@@ -45,7 +48,7 @@ public class PostLoginClient implements EvalClient {
         CreateRequest r = new CreateRequest(params[0],token);
         CreateResult res = server.create(r);
         //return string saying you created the game
-        return String.format("Your game has been created with ID:%d\n", res.gameID());
+        return "Your game has been created";
     }
 
     public String list() throws ResponseException {
@@ -54,6 +57,7 @@ public class PostLoginClient implements EvalClient {
         //return list of all the games (w/ index number next to game name next to current player names (null if color not taken)
         StringBuilder allGames = new StringBuilder();
         gameIndexes.clear();
+        if(res.games().isEmpty()){System.out.println("No current games");}
         int i=1;
         for(GameData game : res.games()){
             allGames.append(String.format("%d-%s, White: %s, Black: %s\n",i,game.gameName(),game.whiteUsername(),game.blackUsername()));
@@ -71,7 +75,8 @@ public class PostLoginClient implements EvalClient {
 //        GameClient.setColor(params[1]);
         if(params[1].equalsIgnoreCase("WHITE")){GameClient.color = "WHITE";}
         else if(params[1].equalsIgnoreCase("BLACK")){GameClient.color = "BLACK";}
-        else{System.out.print("Sorry, player color lost.\n");}
+        else{throw new ResponseException(500,"Unrecognized color");}
+        //else{System.out.print("Sorry, player color lost.\n");}
         return "Transitioning to game page";
     }
 
