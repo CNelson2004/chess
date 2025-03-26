@@ -6,6 +6,7 @@ import dataaccess.*;
 import service.*;
 import spark.*;
 import com.google.gson.Gson;
+import websocket.WebsocketHandler;
 
 public class Server {
 
@@ -13,6 +14,7 @@ public class Server {
     UserDao uDao;
     AuthDao aDao;
     GameDao gDao;
+    WebsocketHandler websocketHandler;
     public Server(){
         this("sql");
     }
@@ -25,6 +27,7 @@ public class Server {
             aDao = new MemoryAuthDao();
             gDao = new MemoryGameDao();
         }
+        websocketHandler = new WebsocketHandler(aDao,gDao);
     }
 
     public void initializeSQLs(){
@@ -44,6 +47,8 @@ public class Server {
         Spark.port(desiredPort); //8080
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", websocketHandler);
 
         // Register your endpoints and handle exceptions here
         Spark.before("*", this::filter);
