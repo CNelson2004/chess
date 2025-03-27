@@ -56,6 +56,7 @@ public class PreLoginClient implements EvalClient {
         PostLoginClient.setToken(authToken);
         PostLoginClient.setUsername(username);
         GameClient.setUsername(username);
+        GameClient.setToken(authToken);
     }
 
     public String help(){

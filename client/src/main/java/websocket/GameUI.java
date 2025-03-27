@@ -1,20 +1,23 @@
 package websocket;
 
-import model.GameData;
+import chess.ChessBoard;
+import ui.Draw;
+import ui.GameClient;
 import websocket.messages.*;
 
 import static ui.EscapeSequences.*;
 
 public class GameUI implements GameHandler{
-    WebsocketFacade wsFacade;
+    //WebsocketFacade wsFacade;
+    //public GameUI(WebsocketFacade wsFacade){this.wsFacade = wsFacade;}
+    public GameUI(){}
 
-    public GameUI(WebsocketFacade wsFacade){
-        this.wsFacade = wsFacade;
+    public void updateGame(ChessBoard game){
+        if(GameClient.getColor()==null){printMessage(new ErrorMessage("Error: Couldn't find player color"));}
+        Draw.drawBoard(game, GameClient.getColor()); //Is this how to get the current color of the user?
     }
 
-    public void updateGame(GameData game){
-
-    }
+    //public static void drawGame(ChessBoard game){}
 
     public void printMessage(ServerMessage message){
         switch (message) {
@@ -27,8 +30,7 @@ public class GameUI implements GameHandler{
                 printPrompt();
             }
             case LoadGameMessage loadGameMessage -> {
-                //redraws board in its new state
-
+                updateGame(loadGameMessage.game.game().getBoard());
             }
             case null, default -> {
             }

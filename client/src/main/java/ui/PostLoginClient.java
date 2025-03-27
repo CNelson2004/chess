@@ -86,6 +86,7 @@ public class PostLoginClient implements EvalClient {
         //Checking if index is valid
         if(params[1].equalsIgnoreCase("WHITE")){GameClient.color = "WHITE";}
         else if(params[1].equalsIgnoreCase("BLACK")){GameClient.color = "BLACK";}
+        GameClient.setGameID(gameID);
         return "Transitioning to game page";
     }
 

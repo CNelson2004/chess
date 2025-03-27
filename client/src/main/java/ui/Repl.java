@@ -1,5 +1,9 @@
 package ui;
 
+import websocket.GameHandler;
+import websocket.GameUI;
+import websocket.WebsocketFacade;
+
 import java.util.Scanner;
 
 public class Repl{
@@ -7,10 +11,10 @@ public class Repl{
     private final PostLoginClient postUI;
     private final GameClient gameUI;
 
-    public Repl(int port){
+    public Repl(int port, String url){
         preUI = new PreLoginClient(port);
         postUI = new PostLoginClient(port);
-        gameUI = new GameClient(port);
+        gameUI = new GameClient(port, url);
     }
 
     public void run(){
@@ -37,7 +41,6 @@ public class Repl{
                     case "Transitioning to game page":
                         currentUI = gameUI;
                         System.out.println(currentUI.help());
-                        System.out.println(gameUI.draw()); //delete after phase 5 complete
                         break;
                     default:
                         System.out.print(result);

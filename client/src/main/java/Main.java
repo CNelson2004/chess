@@ -4,6 +4,7 @@ public class Main {
     public static void main(String[] args) {
         //var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         //System.out.println("♕ 240 Chess Client: " + piece);
-        new Repl(8080).run();
+        String serverUrl = "http://localhost:8080";
+        new Repl(8080,serverUrl).run();
     }
 }
