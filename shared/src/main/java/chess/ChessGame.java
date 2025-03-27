@@ -13,11 +13,17 @@ public class ChessGame {
 
     ChessGame.TeamColor teamTurn;
     ChessBoard board = new ChessBoard();
+    public boolean gameEnded;
 
     public ChessGame() {
         board.resetBoard();
         teamTurn = TeamColor.WHITE;
+        gameEnded = false;
     }
+
+    public boolean hasGameEnded(){return gameEnded;}
+
+    public void setGameEnded(boolean hasEnded){gameEnded = hasEnded;}
 
     /**
      * @return Which team's turn it is
@@ -77,6 +83,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        //If game is over, don't allow any more moves
+        if(gameEnded){throw new InvalidMoveException("Game is over.");}
         //If move is valid, do it, if not throw exception
         //checking if a piece actually exists
         if(board.getPiece(move.getStartPosition())==null){throw new InvalidMoveException("No piece exists.");}

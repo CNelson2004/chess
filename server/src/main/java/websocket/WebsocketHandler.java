@@ -31,7 +31,7 @@ public class WebsocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws DataAccessException, IOException {
+    public void onMessage(Session session, String message)throws DataAccessException, IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         ChessMove move = null;
         if(command.getCommandType()==MAKE_MOVE){
@@ -64,7 +64,7 @@ public class WebsocketHandler {
                 case CONNECT -> connect(session, username, command.getGameID(), color, gDao);
                 case MAKE_MOVE -> makeMove(session, gDao, command.getGameID(), username, move, color);
                 case LEAVE -> leave(session, username, command.getGameID(), gDao, color);
-                case RESIGN -> resign(session, command.getGameID(), username);
+                case RESIGN -> resign(session, command.getGameID(), gDao, username);
                 default -> System.out.println("Cannot find command type");
             }
         }catch (DataAccessException e){
@@ -90,12 +90,12 @@ public class WebsocketHandler {
     private void makeMove(Session session, GameDao gDao, int gameID, String username, ChessMove move, String color) throws IOException, DataAccessException {
         //verify validity of move
         if(move==null){send(session, new ErrorMessage("Error:Null move"));}
-        Collection<ChessMove> validMoves = gDao.getGame(gameID).game().validMoves(move.getStartPosition());
-        //^In debugging will say it ran into a NullPointerException in GetAllPieces, but it is accounted for
-        if(!validMoves.contains(move)){send(session, new ErrorMessage("Error: Invalid move"));}
+        //Collection<ChessMove> validMoves = gDao.getGame(gameID).game().validMoves(move.getStartPosition());
+        //if(!validMoves.contains(move)){send(session, new ErrorMessage("Error: Invalid move"));} //<-Redundant?
         //update game to represent move
         try {
             gDao.getGame(gameID).game().makeMove(move);
+            //^In debugging will say it ran into a NullPointerException in GetAllPieces, but it is accounted for
         } catch(InvalidMoveException e) {
             send(session, new ErrorMessage("Error: Invalid move"));
         }
@@ -118,11 +118,10 @@ public class WebsocketHandler {
         broadcast(session,gameID,new NotificationMessage(message));
     }
 
-    private void resign(Session session, int gameID, String username) throws IOException {
+    private void resign(Session session, int gameID, GameDao gDao, String username) throws IOException, DataAccessException {
         //mark the game as over (no more moves can be made) & update game in database
-        //[make everyone an observer?]
-        //(Don't force leave) (Don't let anyone resign or make move after)
-
+        //Change database code or chess code to have a flag to make it so the game can no longer be updated
+        gDao.getGame(gameID).game().setGameEnded(true);
         //Tell all clients original client has resigned
         String message = String.format("%s has resigned",username);
         broadcast(null,gameID,new NotificationMessage(message));
