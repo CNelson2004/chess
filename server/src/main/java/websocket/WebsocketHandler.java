@@ -89,17 +89,18 @@ public class WebsocketHandler {
     }
 
     private void makeMove(Session session, GameDao gDao, int gameID, String username, ChessMove move, String color) throws IOException, DataAccessException {
-        //If came is complete, then no more moves can be made
         chess.ChessGame.TeamColor theColor = null;
-        if(gDao.getGame(gameID).game().hasGameEnded()){send(session, new ErrorMessage("Error: Game Over-No More Moves"));}
+        //check if you are an observer
+        if(!Objects.equals(username, gDao.getGame(gameID).whiteUsername()) && !Objects.equals(username, gDao.getGame(gameID).blackUsername())){
+            send(session, new ErrorMessage("Error: You are an observer, you cannot move pieces"));}
+        //If came is complete, then no more moves can be made
+        else if(gDao.getGame(gameID).game().hasGameEnded()){send(session, new ErrorMessage("Error: Game Over-No More Moves"));}
         else if(move==null){send(session, new ErrorMessage("Error:Null move"));} //verify validity of move
         else {
-            //Checking if game is in checkmate or stalemate, and if so, make it complete
             if (color.equalsIgnoreCase("white")) {
                 theColor = chess.ChessGame.TeamColor.WHITE;
-            } else {
-                theColor = chess.ChessGame.TeamColor.BLACK;
-            }
+            } else{theColor = chess.ChessGame.TeamColor.BLACK;}
+            //Checking if game is in checkmate or stalemate, and if so, make it complete
             if(gDao.getGame(gameID).game().isInCheckmate(theColor)||gDao.getGame(gameID).game().isInStalemate(theColor)){
                 gDao.getGame(gameID).game().setGameEnded(true);
                 send(session, new ErrorMessage("Error: Game Over-No More Moves"));

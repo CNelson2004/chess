@@ -75,11 +75,7 @@ public class PostLoginClient implements EvalClient {
     }
 
     public String join(String... params) throws ResponseException {
-        int id = -1;
-        try{id = Integer.parseInt(params[0]);}
-        catch(Exception e){throw new ArrayIndexOutOfBoundsException();}
-        if(!(gameIndexes.containsKey(id))){throw new ResponseException(400,"Unrecognized game");}
-        int gameID = gameIndexes.get(id).gameID();
+        int gameID = getGameID(params[0]);
         JoinRequest r = new JoinRequest(params[1].toUpperCase(),gameID,token);
         server.join(r);
         GameClient.setColor(params[1].toUpperCase());
@@ -91,15 +87,20 @@ public class PostLoginClient implements EvalClient {
     }
 
     public String observe(String... params) throws ResponseException {
-        //checking for errors
-        int id = -1;
-        try{id = Integer.parseInt(params[0]);}
-        catch(Exception e){throw new ArrayIndexOutOfBoundsException();}
-        if(!(gameIndexes.containsKey(id))){throw new ResponseException(400,"Unrecognized game");}
         //make sure you only have the one parameter
         if(!(params.length==1)){throw new ArrayIndexOutOfBoundsException();}
+        //setting parameters for the game client
         GameClient.color = "WHITE";
+        GameClient.setGameID(getGameID(params[0]));
         return "Transitioning to game page";
+    }
+
+    public int getGameID(String gameIndex) throws ResponseException {
+        int id;
+        try{id = Integer.parseInt(gameIndex);}
+        catch(Exception e){throw new ArrayIndexOutOfBoundsException();}
+        if(!(gameIndexes.containsKey(id))){throw new ResponseException(400,"Unrecognized game");}
+        return gameIndexes.get(id).gameID();
     }
 
     public String logout(String... params) throws ResponseException {
