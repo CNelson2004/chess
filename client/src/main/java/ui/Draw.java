@@ -69,10 +69,12 @@ public class Draw {
         //drawing row
         int squareRow=0;
         for(ChessPiece piece: theRow){
-            String color = setTeamColor(piece);
-            ChessPiece.PieceType type = piece.getPieceType();
+            String color = null;
+            String icon = null;
+            try {color = setTeamColor(piece);
+                icon = getPieceIcon(color,piece.getPieceType());}
+            catch (Exception _) {}
             //^Can be null if there is no piece on that square (& applies to below)
-            String icon = getPieceIcon(color,type);
             selectHighlightedSquareType(out,currentRow,squareRow,color,icon,cols);
             squareRow++;
         }
@@ -143,7 +145,7 @@ public class Draw {
             //draw letters at the top
             printLetters(out, true);
             //draw rows
-            for (int row = 8; row > 0; row--) {
+            for (int row = 8; row > 0; row--) {  //breaking on third row
                 drawRow(out, row, board);
             }
             //draw letters at the bottom
@@ -151,7 +153,7 @@ public class Draw {
         }
         else{
             printLetters(out,true);
-            for(int row=8;row>0;row--){
+            for(int row=1;row<9;row++){
                 drawRow(out, row, board);
             }
             printLetters(out,true);
@@ -200,10 +202,12 @@ public class Draw {
         //drawing row
         int squareRow=0;
         for(ChessPiece piece: theRow){
-            String color = setTeamColor(piece);
-            ChessPiece.PieceType type = piece.getPieceType();
+            String color = null;
+            String icon = null;
+            try {color = setTeamColor(piece);
+                icon = getPieceIcon(color,piece.getPieceType());}
+            catch (Exception _) {}
             //^Can be null if there is no piece on that square (& applies to below)
-            String icon = getPieceIcon(color,type);
             selectSquareType(out,currentRow,squareRow,color,icon);
             squareRow++;
         }
@@ -370,13 +374,8 @@ public class Draw {
                 if(squareRow%2==0){drawSquare(out,"white",color,lineup[squareRow]);}
                 else{drawSquare(out,"black",color,lineup[squareRow]);}
             }
-            else if(currentRow%2==1){ //current row is odd but has no pieces
-                if(squareRow%2==0){drawSquare(out,"black");}
-                else{drawSquare(out,"white");}
-            }
             else{ //current row is even with no pieces
-                if(squareRow%2==0){drawSquare(out,"white");}
-                else{drawSquare(out,"black");}
+                drawNormalEmptySquare(out,currentRow,squareRow);
             }
 
         }

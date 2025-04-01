@@ -23,30 +23,16 @@ public class GameUI implements GameHandler{
         Draw.drawBoard(game, GameClient.getColor()); //Is this how to get the current color of the user?
     }
 
-    //public static void drawGame(ChessBoard game){}
-
     public void printMessage(ServerMessage message){
         switch (message) {
-            case NotificationMessage notificationMessage -> {
-                System.out.println(SET_TEXT_COLOR_GREEN + notificationMessage.message);
-                printPrompt();
-            }
-            case ErrorMessage errorMessage -> {
-                System.out.println(SET_TEXT_COLOR_RED + errorMessage.errorMessage);
-                printPrompt();
-            }
+            case NotificationMessage notificationMessage -> {System.out.println(SET_TEXT_COLOR_BLUE + notificationMessage.message + RESET_TEXT_COLOR + "\n");}
+            case ErrorMessage errorMessage -> {System.out.println(SET_TEXT_COLOR_RED + errorMessage.errorMessage + RESET_TEXT_COLOR + "\n");}
             case LoadGameMessage loadGameMessage -> {
                 game = loadGameMessage.game.game();
                 board = loadGameMessage.game.game().getBoard();
                 updateGame(loadGameMessage.game.game().getBoard());
             }
-            case null, default -> {
-            }
+            case null, default -> {System.out.println(SET_TEXT_COLOR_GREEN + "Couldn't define message type" + RESET_TEXT_COLOR + "\n");}
         }
-    }
-
-
-    private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_BLUE); //Doubel check this
     }
 }

@@ -173,6 +173,6 @@ public class WebsocketHandler {
     }
 
     public void send(Session session, ServerMessage msg) throws IOException {
-        session.getRemote().sendString(msg.toString()); //turns the message into a JSON
+        session.getRemote().sendString(new Gson().toJson(msg)); //turns the message into a JSON
     }
 }

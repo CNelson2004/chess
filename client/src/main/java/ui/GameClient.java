@@ -25,7 +25,6 @@ public class GameClient implements EvalClient {
     public GameClient(int port, String url) {
         server = new ServerFacade(port);
         this.url = url;
-        wsFacade = new WebsocketFacade(url, new GameUI());
     }
 
     public static void setColor(String value){color = value;}
@@ -59,6 +58,7 @@ public class GameClient implements EvalClient {
 
     public void initial() throws ResponseException {
         try {
+            wsFacade = new WebsocketFacade(url, new GameUI());
             wsFacade.connect(token, gameID);
         } catch(ResponseException e){
         throw new ResponseException(500,"Game failure");
@@ -99,7 +99,7 @@ public class GameClient implements EvalClient {
         //double checks if user wants to resign
         if(!confirmResign){
             confirmResign = true;
-            return "Are you sure you want to resign?";
+            return "Are you sure you want to resign? If so, type resign again \n";
         }
         //resigns without making them leave the game
         wsFacade.resign(token,gameID);
