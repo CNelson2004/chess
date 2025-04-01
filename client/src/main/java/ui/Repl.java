@@ -40,6 +40,10 @@ public class Repl{
                         break;
                     case "Transitioning to game page":
                         currentUI = gameUI;
+                        //print out game screen, then offer help
+                        //if(GameClient.getColor().equals("WHITE")){Draw.drawBoard();
+                        //}else{Draw.drawBoardBlack();}
+                        gameUI.initial();
                         System.out.println(currentUI.help());
                         break;
                     default:

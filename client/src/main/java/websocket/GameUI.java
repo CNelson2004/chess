@@ -1,6 +1,7 @@
 package websocket;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import ui.Draw;
 import ui.GameClient;
 import websocket.messages.*;
@@ -8,11 +9,16 @@ import websocket.messages.*;
 import static ui.EscapeSequences.*;
 
 public class GameUI implements GameHandler{
-    //WebsocketFacade wsFacade;
-    //public GameUI(WebsocketFacade wsFacade){this.wsFacade = wsFacade;}
+    //Have game client hold the current board so that redraw in Game client can use it?
+    ChessBoard board;
+    ChessGame game;
     public GameUI(){}
 
+    public ChessGame getGame(){return game;}
+    public ChessBoard getBoard(){return board;}
+
     public void updateGame(ChessBoard game){
+        //draws board for the client
         if(GameClient.getColor()==null){printMessage(new ErrorMessage("Error: Couldn't find player color"));}
         Draw.drawBoard(game, GameClient.getColor()); //Is this how to get the current color of the user?
     }
@@ -30,6 +36,8 @@ public class GameUI implements GameHandler{
                 printPrompt();
             }
             case LoadGameMessage loadGameMessage -> {
+                game = loadGameMessage.game.game();
+                board = loadGameMessage.game.game().getBoard();
                 updateGame(loadGameMessage.game.game().getBoard());
             }
             case null, default -> {

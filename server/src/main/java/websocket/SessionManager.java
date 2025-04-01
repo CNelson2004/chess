@@ -12,8 +12,9 @@ import websocket.messages.ServerMessage;
 
 public class SessionManager {
     public final ConcurrentHashMap<Integer, Set<Session>> connections = new ConcurrentHashMap<>();
+    //Have second map of session to gameID?
 
-    public void add(int gameID, Session session){
+    public void add(int gameID, Session session){ //could add synchronize keyword to all these critical functions
         try{
             //situation is which game already exists
             connections.get(gameID).add(session);

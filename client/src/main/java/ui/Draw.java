@@ -310,7 +310,6 @@ public class Draw {
 
 
     //Static starting board
-    /*
     public static void drawBoard(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
@@ -386,5 +385,5 @@ public class Draw {
         setBlack(out);
         out.println();
     }
-     */
+
 }

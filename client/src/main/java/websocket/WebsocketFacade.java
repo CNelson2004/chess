@@ -18,13 +18,11 @@ import websocket.messages.ServerMessage;
 
 public class WebsocketFacade extends Endpoint implements MessageHandler.Whole<String>{
 
-    GameHandler gameHandler;
+    GameUI gameHandler;
     Session session;
     ChessGame game;
 
-    public GameHandler getHandler(){return gameHandler;}
-
-    public WebsocketFacade(String url, GameHandler gameHandler){
+    public WebsocketFacade(String url, GameUI gameHandler){
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -62,8 +60,9 @@ public class WebsocketFacade extends Endpoint implements MessageHandler.Whole<St
         gameHandler.printMessage(mes);
     }
 
-    public ChessBoard getBoard(){return game.getBoard();}
-    public ChessGame getGame(){return game;}
+    public GameHandler getHandler(){return gameHandler;}
+    public ChessBoard getBoard(){return gameHandler.getBoard();}
+    public ChessGame getGame(){return gameHandler.getGame();}
 
     //private sendMessage(){}
 

@@ -20,10 +20,12 @@ public class GameClient implements EvalClient {
     private String currentCMD = "";
     private String url;
     private boolean confirmResign = false;
+    private boolean first = true;
 
     public GameClient(int port, String url) {
         server = new ServerFacade(port);
         this.url = url;
+        wsFacade = new WebsocketFacade(url, new GameUI());
     }
 
     public static void setColor(String value){color = value;}
@@ -40,9 +42,6 @@ public class GameClient implements EvalClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            //since you just joined the game you connect to the game
-            wsFacade = new WebsocketFacade(url, new GameUI());
-            wsFacade.connect(token, gameID);
 
             return switch (cmd) {
                 case "quit" -> "quit";
@@ -56,6 +55,14 @@ public class GameClient implements EvalClient {
         }catch(ResponseException e){
             throw new ResponseException(500,"Game failure");
         }
+    }
+
+    public void initial() throws ResponseException {
+        try {
+            wsFacade.connect(token, gameID);
+        } catch(ResponseException e){
+        throw new ResponseException(500,"Game failure");
+    }
     }
 
     public String draw(){
