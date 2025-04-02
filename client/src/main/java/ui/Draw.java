@@ -21,19 +21,17 @@ public class Draw {
     }
 
     public static ArrayList<ArrayList<Integer>> createRowHolder(Collection<ChessPosition> moves){
-        ArrayList<Integer> row1,row2,row3,row4,row5,row6,row7,row8;
-        row1=row2=row3=row4=row5=row6=row7=row8=new ArrayList<>();
-        ArrayList<ArrayList<Integer>> allRows = new ArrayList<>(Arrays.asList(row1,row2,row3,row4,row5,row6,row7,row8));
+        ArrayList<ArrayList<Integer>> allRows = new ArrayList<>(Arrays.asList(new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>()));
         for(ChessPosition move: moves){
             switch(move.getRow()){
-                case 1 -> row1.add(move.getColumn());
-                case 2 -> row2.add(move.getColumn());
-                case 3 -> row3.add(move.getColumn());
-                case 4 -> row4.add(move.getColumn());
-                case 5 -> row5.add(move.getColumn());
-                case 6 -> row6.add(move.getColumn());
-                case 7 -> row7.add(move.getColumn());
-                case 8 -> row8.add(move.getColumn());
+                case 1 -> allRows.get(0).add(move.getColumn()-1);
+                case 2 -> allRows.get(1).add(move.getColumn()-1);
+                case 3 -> allRows.get(2).add(move.getColumn()-1);
+                case 4 -> allRows.get(3).add(move.getColumn()-1);
+                case 5 -> allRows.get(4).add(move.getColumn()-1);
+                case 6 -> allRows.get(5).add(move.getColumn()-1);
+                case 7 -> allRows.get(6).add(move.getColumn()-1);
+                case 8 -> allRows.get(7).add(move.getColumn()-1);
             }
         }
         return allRows;
@@ -55,7 +53,7 @@ public class Draw {
         }
         else{
             printLetters(out,true);
-            for(int row=8;row>0;row--){
+            for(int row=1;row<9;row++){
                 drawHighlightedRow(out, row, board, allRows.get(row-1));
             }
             printLetters(out,true);
@@ -105,7 +103,7 @@ public class Draw {
                 if (squareRow % 2 == 0) {
                     drawSquare(out, "lightGreen", color, icon);
                 } else {
-                    drawSquare(out, "Green", color, icon);
+                    drawSquare(out, "green", color, icon);
                 }
             }
         }else{
@@ -120,8 +118,8 @@ public class Draw {
                 else{drawSquare(out,"lightGreen");} //light green
             }
             else{ //current row is even
-                if(squareRow%2==0){drawSquare(out,"lightGreen");}
-                else{drawSquare(out,"Green");}
+                if(squareRow%2==0){drawSquare(out,"lightGreen");} //use the one with 4 parameters
+                else{drawSquare(out,"green");}
             }
         }else{
             drawNormalEmptySquare(out,currentRow,squareRow);
@@ -287,8 +285,12 @@ public class Draw {
     }
 
     private static void drawSquare(PrintStream out, String color){
-        if(color.equals("black")){setBrown(out);}
-        else{setLightBrown(out);}
+        switch (color) {
+            case "black" -> setBrown(out);
+            case "white" -> setLightBrown(out);
+            case "green" -> setGreen(out);
+            case "lightGreen" -> setLightGreen(out);
+        }
         out.print(EMPTY);
     }
 
@@ -305,6 +307,16 @@ public class Draw {
     private static void setLightBrown(PrintStream out){
         out.print(SET_BG_COLOR_LIGHT_BROWN);
         out.print(SET_TEXT_COLOR_LIGHT_BROWN);
+    }
+
+    private static void setGreen(PrintStream out){
+        out.print(SET_BG_COLOR_DARK_GREEN);
+        out.print(SET_TEXT_COLOR_DARK_GREEN);
+    }
+
+    private static void setLightGreen(PrintStream out){
+        out.print(SET_BG_COLOR_GREEN);
+        out.print(SET_TEXT_COLOR_GREEN);
     }
 
     private static void reset(PrintStream out){
