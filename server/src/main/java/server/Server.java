@@ -35,7 +35,7 @@ public class Server {
             uDao = new SQLUserDao();
             aDao = new SQLAuthDao();
             gDao = new SQLGameDao();
-        } catch (DataAccessException e){
+        } catch (Exception e){
             System.out.println("Database connection error with SQL, switching to memory");
             uDao = new MemoryUserDao();
             aDao = new MemoryAuthDao();
