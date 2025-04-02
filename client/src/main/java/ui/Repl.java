@@ -14,7 +14,7 @@ public class Repl{
     public Repl(int port, String url){
         preUI = new PreLoginClient(port);
         postUI = new PostLoginClient(port);
-        gameUI = new GameClient(port, url);
+        gameUI = new GameClient(url);
     }
 
     public void run(){

@@ -1,7 +1,6 @@
 package ui;
 
 import chess.*;
-import websocket.GameHandler;
 import websocket.GameUI;
 import websocket.WebsocketFacade;
 
@@ -10,31 +9,24 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class GameClient implements EvalClient {
-    private final ServerFacade server;
     private WebsocketFacade wsFacade;
-    GameHandler gameHandler;
     protected static String color;
     protected static String username;
     protected static int gameID;
     protected static String token;
     private String currentCMD = "";
-    private String url;
+    private final String url;
     private boolean confirmResign = false;
-    private boolean first = true;
 
-    public GameClient(int port, String url) {
-        server = new ServerFacade(port);
+    public GameClient(String url) {
         this.url = url;
     }
 
     public static void setColor(String value){color = value;}
     public static String getColor(){return color;}
     public static void setUsername(String value){username = value;}
-    public static String getUsername(){return username;}
     public static void setGameID(int value){gameID = value;}
-    public static int getGameID(){return gameID;}
     public static void setToken(String value){token = value;}
-    public static String getToken(){return token;}
 
     public String eval(String input) throws ResponseException{
         try {
@@ -55,7 +47,7 @@ public class GameClient implements EvalClient {
         }catch(ResponseException e){
             if(currentCMD.startsWith("move") || currentCMD.startsWith("highlight")){
                 System.out.println("Invalid move syntax");
-                return help();                                 //make sure this works
+                return help();
             }else{
                 //leave the game and throw an error so they can rejoin
                 leave();
@@ -115,8 +107,7 @@ public class GameClient implements EvalClient {
     }
 
     public String makeMove(String... params) throws ResponseException {
-        //User inputs what move they want to make (How does user input their move? [in what way through text?]
-        //(Input row and then col you want to move to)
+        //User inputs what move they want to make
         ChessPosition start;
         ChessPosition end;
         try {
@@ -125,17 +116,16 @@ public class GameClient implements EvalClient {
         } catch (Exception e){
             throw new ResponseException(500,"Wrong input");
         }
-        //Use board to figure out promotion piece
         ChessBoard board = wsFacade.getBoard();
         ChessPiece.PieceType current = board.getPiece(start).getPieceType();
-        //automatically set promotion type as queen (change to prompt user to pick promotion piece?)
+        //dealing with promotion
         ChessPiece.PieceType prom = null;
         if(current == ChessPiece.PieceType.PAWN && (end.getRow()==1 || end.getRow()==8)){
             prom = getProm(params[2]);
         }
         //making the move
         ChessMove move = new ChessMove(start,end,prom);
-        wsFacade.makeMove(token,gameID,move);            //make sure this promotes the pawn when needed
+        wsFacade.makeMove(token,gameID,move);
         confirmResign = false;
         return "";}
 
@@ -151,8 +141,7 @@ public class GameClient implements EvalClient {
     }
 
     public String highlightMoves(String... params) throws ResponseException {
-        //User inputs piece for which they want to highlight legal moves
-        //(Getting info)
+        //Getting info
         ChessGame game = wsFacade.getGame();
         ChessBoard board = game.getBoard();
         Collection<ChessMove> allMoves;

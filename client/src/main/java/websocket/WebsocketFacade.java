@@ -37,14 +37,10 @@ public class WebsocketFacade extends Endpoint{ //Do I need to implement this?
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
-    //public void onClose(Session session, EndpointConfig endpointConfig) {}
-    //public void onError(Session session, EndpointConfig endpointConfig) {}
-
 
     MessageHandler handler = new MessageHandler.Whole<String>() {
         @Override
         public void onMessage(String message) {
-            //message is a ServerMessage
             ServerMessage mes = new Gson().fromJson(message, ServerMessage.class);
             //Checking specifically which subclass it is
             if(mes.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){mes = new Gson().fromJson(message, NotificationMessage.class);}
@@ -55,11 +51,10 @@ public class WebsocketFacade extends Endpoint{ //Do I need to implement this?
         }
     };
 
-    public GameHandler getHandler(){return gameHandler;}
     public ChessBoard getBoard(){return gameHandler.getBoard();}
     public ChessGame getGame(){return gameHandler.getGame();}
 
-    //private sendMessage(){}
+    //private sendMessage(){} //unused method
 
     public void connect(String authToken, int gameID) throws ResponseException {
         try{

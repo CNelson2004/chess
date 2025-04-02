@@ -21,8 +21,6 @@ public class PostLoginClient implements EvalClient {
     public static void setToken(String value){token = value;}
     public static void setUsername(String value){username = value;}
 
-    public static String getToken(){return token;}
-
     public String eval(String input) throws ResponseException{
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -31,7 +29,7 @@ public class PostLoginClient implements EvalClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
-                case "create" -> create(params);
+                case "create" -> create(params); //Make it list games after creating so index is in memory?
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);

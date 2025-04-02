@@ -2,7 +2,6 @@ package websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
-import chess.ChessPosition;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.*;
@@ -24,14 +23,11 @@ public class WebsocketHandler {
     private final SessionManager sessions = new SessionManager();
     AuthDao aDao;
     GameDao gDao;
-    //static ChessGame currentGame;
 
     public WebsocketHandler(AuthDao aDao, GameDao gDao){
         this.aDao = aDao;
         this.gDao = gDao;
     }
-
-    //public static ChessGame getGame(){return currentGame;}
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message)throws DataAccessException, IOException {
@@ -41,9 +37,6 @@ public class WebsocketHandler {
         if(command.getCommandType()==MAKE_MOVE){
             MakeMoveCommand temp = new Gson().fromJson(message, MakeMoveCommand.class);
              move = temp.getMove();
-             //ChessPosition startMove = tempMove.getStartPosition(); //rows are correct, but col is -1 from input
-             //ChessPosition endMove = tempMove.getEndPosition();
-             //move = new ChessMove(new ChessPosition(startMove.getRow(),startMove.getColumn()+1), new ChessPosition(endMove.getRow(),endMove.getColumn()+1),tempMove.getPromotionPiece());
         }
         //deciding what to do with message
         try {
@@ -77,9 +70,8 @@ public class WebsocketHandler {
     }
 
     private void connect(Session session, String username, int gameID, String color, GameDao gDao, AuthDao aDao) throws IOException, DataAccessException {
-        //send Load Game message to original client
         sessions.add(gameID,session);
-        //send load game message
+        //send Load Game message to original client
         send(session,new LoadGameMessage(gDao.getGame(gameID)));
         //send message to rest of clients
         String message;
@@ -114,8 +106,8 @@ public class WebsocketHandler {
             else {
                 //update game to represent move
                 try {
+                    //In debugging will say it(below) ran into a NullPointerException in GetAllPieces, but it is accounted for
                     gDao.getGame(gameID).game().makeMove(move);
-                    //^In debugging will say it ran into a NullPointerException in GetAllPieces, but it is accounted for
                     //send LoadGame message to all clients in game(including root)
                     broadcast(null, gameID, new LoadGameMessage(gDao.getGame(gameID)));
                     //send notification to all other clients in game
@@ -124,7 +116,7 @@ public class WebsocketHandler {
                     send(session, new ErrorMessage("Error: Invalid move"));
                 }
                 //If move results in check, send notification message to all clients (including root)
-                if (gDao.getGame(gameID).game().isInCheck(ChessGame.TeamColor.valueOf(color))) {//Check if color needs to be changed in a different way
+                if (gDao.getGame(gameID).game().isInCheck(ChessGame.TeamColor.valueOf(color))) {
                     broadcast(null, gameID, new NotificationMessage(String.format("%s is in check", color)));
                 }
             }
@@ -132,7 +124,7 @@ public class WebsocketHandler {
     }
 
     private void leave(Session session, String username, int gameID, GameDao gDao, String color) throws IOException, DataAccessException {
-        //update game to remove the client (Give color that client is)
+        //update game to remove the client
         if(color != null){gDao.updateGame(gDao.getGame(gameID),color,null);}
         sessions.remove(session);
         //Tell other clients that original client left
@@ -147,7 +139,7 @@ public class WebsocketHandler {
         }else if (gDao.getGame(gameID).game().hasGameEnded()) { //If one person resigned(WHITE), the other person cannot resign(BLACK)
                 send(session, new ErrorMessage("Error: Opponent already resigned"));}
         else{
-            //mark the game as over (no more moves can be made) & update game in database(Change database code or chess code to have a flag to make it so the game can no longer be updated)
+            //mark the game as over (no more moves can be made)
             gDao.getGame(gameID).game().setGameEnded(true);
             //Tell all clients original client has resigned
             String message = String.format("%s has resigned", username);
@@ -156,8 +148,6 @@ public class WebsocketHandler {
     }
 
     public void broadcast(Session excludeUser, int gameID, ServerMessage message) throws IOException {
-        //load game will draw the board
-        //notificatoin and error will print
         ArrayList<Session> removeList = new ArrayList<>();
         for (Session s : sessions.getSessions(gameID)){
             if (s.isOpen()) {
