@@ -204,7 +204,7 @@ public class Draw {
             String icon = null;
             try {color = setTeamColor(piece);
                 icon = getPieceIcon(color,piece.getPieceType());}
-            catch (Exception _) {}
+            catch (Exception e) {continue;}
             //^Can be null if there is no piece on that square (& applies to below)
             selectSquareType(out,currentRow,squareRow,color,icon);
             squareRow++;
