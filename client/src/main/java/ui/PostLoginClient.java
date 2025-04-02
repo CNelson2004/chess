@@ -29,7 +29,7 @@ public class PostLoginClient implements EvalClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
-                case "create" -> create(params); //Make it list games after creating so index is in memory?
+                case "create" -> doCreate(params);
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
@@ -48,6 +48,11 @@ public class PostLoginClient implements EvalClient {
             }
             else{throw ex;}
         }
+    }
+
+    public String doCreate(String... params) throws ResponseException{ //creates then lists the games
+        System.out.println(create(params));
+        return list();
     }
 
     public String create(String... params) throws ResponseException {
