@@ -40,6 +40,7 @@ public class GameClient implements EvalClient {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            currentCMD = cmd;
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
@@ -52,7 +53,14 @@ public class GameClient implements EvalClient {
                 default -> help();
             };
         }catch(ResponseException e){
-            throw new ResponseException(500,"Game failure");
+            if(currentCMD.startsWith("move") || currentCMD.startsWith("highlight")){
+                System.out.println("Invalid move syntax");
+                return help();                                 //make sure this works
+            }else{
+                //leave the game and throw an error so they can rejoin
+                leave();
+                throw new ResponseException(500,"Game failure");
+            }
         }
     }
 
@@ -76,22 +84,58 @@ public class GameClient implements EvalClient {
         return "Transitioning to main page";
     }
 
+    private int getCol(String letter){
+        switch(letter){
+            case "a" -> {return 1;}
+            case "b" -> {return 2;}
+            case "c" -> {return 3;}
+            case "d" -> {return 4;}
+            case "e" -> {return 5;}
+            case "f" -> {return 6;}
+            case "g" -> {return 7;}
+            case "h" -> {return 8;}
+            default -> {return -1;}
+        }
+    }
+
+    private ChessPosition getPos(String pos){ //format c2 (col then row)
+        int row = Integer.parseInt(Character.toString(pos.charAt(1)));
+        int col = getCol(Character.toString(pos.charAt(0)));
+        return new ChessPosition(row,col);
+    }
+
+    private ChessPiece.PieceType getProm(String promType){
+        switch(promType){
+            case "rook" -> {return ChessPiece.PieceType.ROOK;}
+            case "knight" -> {return ChessPiece.PieceType.KNIGHT;}
+            case "bishop" -> {return ChessPiece.PieceType.BISHOP;}
+            case "queen" -> {return ChessPiece.PieceType.QUEEN;}
+            default -> {return null;}
+        }
+    }
+
     public String makeMove(String... params) throws ResponseException {
         //User inputs what move they want to make (How does user input their move? [in what way through text?]
         //(Input row and then col you want to move to)
-        ChessPosition start = new ChessPosition(Integer.parseInt(params[0]),Integer.parseInt(params[1]));
-        ChessPosition end = new ChessPosition(Integer.parseInt(params[2]),Integer.parseInt(params[3]));
+        ChessPosition start;
+        ChessPosition end;
+        try {
+            start = getPos(params[0]);
+            end = getPos(params[1]);
+        } catch (Exception e){
+            throw new ResponseException(500,"Wrong input");
+        }
         //Use board to figure out promotion piece
         ChessBoard board = wsFacade.getBoard();
         ChessPiece.PieceType current = board.getPiece(start).getPieceType();
         //automatically set promotion type as queen (change to prompt user to pick promotion piece?)
         ChessPiece.PieceType prom = null;
-        if(current == ChessPiece.PieceType.PAWN && (start.getRow()==1 || start.getRow()==8)){
-            prom = ChessPiece.PieceType.QUEEN;
+        if(current == ChessPiece.PieceType.PAWN && (end.getRow()==1 || end.getRow()==8)){
+            prom = getProm(params[2]);
         }
         //making the move
         ChessMove move = new ChessMove(start,end,prom);
-        wsFacade.makeMove(token,gameID,move);
+        wsFacade.makeMove(token,gameID,move);            //make sure this promotes the pawn when needed
         confirmResign = false;
         return "";}
 
@@ -106,12 +150,17 @@ public class GameClient implements EvalClient {
         return "";
     }
 
-    public String highlightMoves(String... params){
+    public String highlightMoves(String... params) throws ResponseException {
         //User inputs piece for which they want to highlight legal moves
         //(Getting info)
         ChessGame game = wsFacade.getGame();
         ChessBoard board = game.getBoard();
-        Collection<ChessMove> allMoves = game.validMoves(new ChessPosition(Integer.parseInt(params[0]),Integer.parseInt(params[1])));
+        Collection<ChessMove> allMoves;
+        try {
+            allMoves = game.validMoves(getPos(params[0]));
+        } catch (Exception e){
+            throw new ResponseException(500,"Wrong input");
+        }
         Collection<ChessPosition> moves = new ArrayList<>();
         for(ChessMove move: allMoves){
             moves.add(move.getEndPosition());
@@ -124,10 +173,12 @@ public class GameClient implements EvalClient {
         return """
                 * help - list commands
                 * redraw - redraws chess board
-                * move <Starting Row> <Starting Col> <Ending Row> <Ending Col>- make a chess move
+                * move <Starting Position> <Ending Position> <Promotion Piece>- make a chess move
+                  If applicable, add Promotion piece for the pawn reaching the end of the board
+                  Ex: b7 b8 queen
                 * leave - return to main screen
                 * resign - forfeit game
-                * highlight <Piece Row> <Piece Col> - highlights legal moves
+                * highlight <Position> - highlights legal moves
                 """;
     }
 }
