@@ -123,7 +123,10 @@ public class WebsocketHandler {
                     send(ses, new ErrorMessage("Error: Invalid move"));
                 }
                 //If move results in check, send notification message to all clients (including root)
-                if (game.game().isInCheck(ChessGame.TeamColor.valueOf(color))) {
+                if (game.game().isInCheck(ChessGame.TeamColor.valueOf("WHITE"))) {
+                    broadcast(null, gameID, new NotificationMessage(String.format("%s is in check", color)));
+                }
+                if (game.game().isInCheck(ChessGame.TeamColor.valueOf("BLACK"))) {
                     broadcast(null, gameID, new NotificationMessage(String.format("%s is in check", color)));
                 }
             }
