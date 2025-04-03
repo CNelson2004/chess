@@ -55,7 +55,7 @@ public class WebsocketHandler {
                     case CONNECT -> connect(session, username, command.getGameID(), color, gDao);
                     case MAKE_MOVE -> makeMove(session, gDao, command.getGameID(), username, move, color);
                     case LEAVE -> leave(session, username, command.getGameID(), gDao, color);
-                    case RESIGN -> resign(session, command.getGameID(), gDao, username);
+                    case RESIGN -> resign(session, command.getGameID(), gDao, username, color);
                     default -> System.out.println("Cannot find command type");
                 }
             }
@@ -140,18 +140,19 @@ public class WebsocketHandler {
         broadcast(session,gameID,new NotificationMessage(message));
     }
 
-    private void resign(Session session, int gameID, GameDao gDao, String username) throws IOException, DataAccessException {
+    private void resign(Session ses, int gameID, GameDao gDao, String name, String color) throws IOException, DataAccessException {
         GameData game = getGame(gDao,gameID);
         //Check if session is an observer, if so, they cannot resign
-        if(!Objects.equals(game.blackUsername(), username) && !Objects.equals(game.whiteUsername(), username)){
-            send(session, new ErrorMessage("Error: Observer cannot resign")); //Change to notification message?
+        if(!Objects.equals(game.blackUsername(), name) && !Objects.equals(game.whiteUsername(), name)){
+            send(ses, new ErrorMessage("Error: Observer cannot resign")); //Change to notification message?
         }else if (game.game().hasGameEnded()) { //If one person resigned(WHITE), the other person cannot resign(BLACK)
-                send(session, new ErrorMessage("Error: Opponent already resigned"));}
+                send(ses, new ErrorMessage("Error: Opponent already resigned"));}
         else{
-            //mark the game as over (no more moves can be made)
+            //mark the game as over (no more moves can be made) & put it in Dao
             game.game().setGameEnded(true);
+            gDao.updateGame(game,color,name);
             //Tell all clients original client has resigned
-            String message = String.format("%s has resigned", username);
+            String message = String.format("%s has resigned", name);
             broadcast(null, gameID, new NotificationMessage(message));
         }
     }
