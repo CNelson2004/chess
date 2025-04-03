@@ -150,18 +150,18 @@ public class Draw {
             //draw letters at the top
             printLetters(out, true);
             //draw rows
-            for (int row = 8; row > 0; row--) {  //breaking on third row
-                drawRow(out, row, board);
+            for (int row = 8; row > 0; row--) {
+                drawRow(out, row, board, color);
             }
             //draw letters at the bottom
             printLetters(out, true);
         }
-        else{
-            printLetters(out,true);
+        else{ //black
+            printLetters(out,false);
             for(int row=1;row<9;row++){
-                drawRow(out, row, board);
+                drawRow(out, row, board, color);
             }
-            printLetters(out,true);
+            printLetters(out,false);
         }
     }
 
@@ -200,25 +200,41 @@ public class Draw {
         return color;
     }
 
-    private static void drawRow(PrintStream out, int currentRow, ChessBoard board){
+    private static int updateSquareRow(int squareRow, String color){
+        if(color.equalsIgnoreCase("white")){
+            return ++squareRow;
+        }else{
+            return --squareRow;
+        }
+    }
+
+    private static void drawRow(PrintStream out, int currentRow, ChessBoard board, String theColor){
         ChessPiece[] theRow = board.getBoard()[currentRow-1];
         //drawing numbers on left
         printNum(out,currentRow);
         //drawing row
-        int squareRow=0;
-        for(ChessPiece piece: theRow){
+        int squareRow;
+        int stop;
+        if(theColor.equalsIgnoreCase("white")){
+            squareRow=1;
+            stop = 9;
+        }
+        else{squareRow=8;
+            stop = 0;}
+        while(squareRow != stop){
+            ChessPiece piece = theRow[squareRow-1];
             String color = null;
             String icon = null;
             try {
                 color = setTeamColor(piece);
                 icon = getPieceIcon(color, piece.getPieceType());
                 selectSquareType(out, currentRow, squareRow, color, icon);
-                squareRow++;
+                squareRow = updateSquareRow(squareRow,theColor);
             }catch (Exception e) {
                 selectSquareType(out,currentRow,squareRow,color,icon);
-                squareRow++;
+                squareRow = updateSquareRow(squareRow,theColor);
             }
-            //^Can be null if there is no piece on that square (& applies to below)
+            //^Can be null if there is no piece on that square
         }
         //drawing numbers on right
         printNum(out,currentRow);

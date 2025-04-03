@@ -77,17 +77,17 @@ public class GameClient implements EvalClient {
     }
 
     private int getCol(String letter){
-        switch(letter){
-            case "a" -> {return 1;}
-            case "b" -> {return 2;}
-            case "c" -> {return 3;}
-            case "d" -> {return 4;}
-            case "e" -> {return 5;}
-            case "f" -> {return 6;}
-            case "g" -> {return 7;}
-            case "h" -> {return 8;}
-            default -> {return -1;}
-        }
+            switch (letter) {
+                case "a" -> {return 1;}
+                case "b" -> {return 2;}
+                case "c" -> {return 3;}
+                case "d" -> {return 4;}
+                case "e" -> {return 5;}
+                case "f" -> {return 6;}
+                case "g" -> {return 7;}
+                case "h" -> {return 8;}
+                default -> {return -1;}
+            }
     }
 
     private ChessPosition getPos(String pos){ //format c2 (col then row)
@@ -111,6 +111,7 @@ public class GameClient implements EvalClient {
         ChessPosition start;
         ChessPosition end;
         ChessPiece.PieceType prom = null;
+        //check if they are Black, if so, then change stuff
         try {
             start = getPos(params[0]);
             end = getPos(params[1]);
