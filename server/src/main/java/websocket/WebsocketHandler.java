@@ -116,8 +116,8 @@ public class WebsocketHandler {
                     //send LoadGame message to all clients in game(including root)
                     broadcast(null, gameID, new LoadGameMessage(game));
                     //send notification to all other clients in game
-                    String start = move.getStartPosition().toString();
-                    String end = move.getEndPosition().toString();
+                    String start = convertMove(move.getStartPosition().getRow(),move.getStartPosition().getColumn());
+                    String end = convertMove(move.getEndPosition().getRow(),move.getEndPosition().getColumn());
                     broadcast(ses, gameID, new NotificationMessage(String.format("%s has moved from %s to %s", name, start, end)));
                 } catch (InvalidMoveException e) {
                     send(ses, new ErrorMessage("Error: Invalid move"));
@@ -130,6 +130,26 @@ public class WebsocketHandler {
                     broadcast(null, gameID, new NotificationMessage(String.format("%s is in check", color)));
                 }
             }
+        }
+    }
+
+    private String convertMove(int row, int col){
+        String theRow = String.valueOf(row);
+        String theCol = letterConverter(col);
+        return String.format(theCol+theRow);
+    }
+
+    private String letterConverter(int col){
+        switch(col){
+            case 1 -> {return "a";}
+            case 2 -> {return "b";}
+            case 3 -> {return "c";}
+            case 4 -> {return "d";}
+            case 5 -> {return "e";}
+            case 6 -> {return "f";}
+            case 7 -> {return "g";}
+            case 8 -> {return "h";}
+            default -> {return "z";} //Error
         }
     }
 
