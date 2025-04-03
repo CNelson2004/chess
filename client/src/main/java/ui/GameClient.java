@@ -110,22 +110,26 @@ public class GameClient implements EvalClient {
         //User inputs what move they want to make
         ChessPosition start;
         ChessPosition end;
+        ChessPiece.PieceType prom = null;
         try {
             start = getPos(params[0]);
             end = getPos(params[1]);
+            ChessBoard board = wsFacade.getBoard();
+            ChessPiece.PieceType current = board.getPiece(start).getPieceType();
+            //dealing with promotion
+            if(current == ChessPiece.PieceType.PAWN && (end.getRow()==1 || end.getRow()==8)){
+                prom = getProm(params[2]);
+            }
         } catch (Exception e){
             throw new ResponseException(500,"Wrong input");
         }
-        ChessBoard board = wsFacade.getBoard();
-        ChessPiece.PieceType current = board.getPiece(start).getPieceType();
-        //dealing with promotion
-        ChessPiece.PieceType prom = null;
-        if(current == ChessPiece.PieceType.PAWN && (end.getRow()==1 || end.getRow()==8)){
-            prom = getProm(params[2]);
-        }
         //making the move
         ChessMove move = new ChessMove(start,end,prom);
-        wsFacade.makeMove(token,gameID,move);
+        try {
+            wsFacade.makeMove(token, gameID, move);
+        }catch(Exception e){
+            throw new ResponseException(500,"Piece Error");
+        }
         confirmResign = false;
         return "";}
 
