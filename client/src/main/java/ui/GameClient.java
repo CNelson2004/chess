@@ -16,7 +16,7 @@ public class GameClient implements EvalClient {
     protected static String token;
     private String currentCMD = "";
     private final String url;
-    private boolean confirmResign = false;
+    private boolean confirmResign;
 
     public GameClient(String url) {
         this.url = url;
@@ -41,6 +41,7 @@ public class GameClient implements EvalClient {
                 case "leave" -> leave();
                 case "move" -> makeMove(params);
                 case "resign" -> resign();
+                case "yes", "y", "Yes", "Y", "YES", "no", "n", "No", "NO", "N" -> confirmResign();
                 case "highlight" -> highlightMoves(params);
                 default -> help();
             };
@@ -136,13 +137,19 @@ public class GameClient implements EvalClient {
 
     public String resign() throws ResponseException {
         //double checks if user wants to resign
-        if(!confirmResign){
-            confirmResign = true;
-            return "Are you sure you want to resign? If so, type resign again \n";
+        confirmResign = true;
+        return "Are you sure you want to resign? (yes/no)\n";
+    }
+
+    public String confirmResign() throws ResponseException {
+        if(currentCMD.equalsIgnoreCase("yes") ||  currentCMD.equalsIgnoreCase("y")){
+            //resigns without making them leave the game
+            wsFacade.resign(token,gameID);
+            return "";
+        } else {
+            confirmResign = false;
+            return "You have NOT resigned\n";
         }
-        //resigns without making them leave the game
-        wsFacade.resign(token,gameID);
-        return "";
     }
 
     public String highlightMoves(String... params) throws ResponseException {

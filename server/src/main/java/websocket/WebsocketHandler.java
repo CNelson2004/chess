@@ -119,16 +119,27 @@ public class WebsocketHandler {
                     String start = convertMove(move.getStartPosition().getRow(),move.getStartPosition().getColumn());
                     String end = convertMove(move.getEndPosition().getRow(),move.getEndPosition().getColumn());
                     broadcast(ses, gameID, new NotificationMessage(String.format("%s has moved from %s to %s", name, start, end)));
+
+                    //Checking if anyone is in checkmate, if so, end game
+                    if(game.game().isInCheckmate(ChessGame.TeamColor.valueOf("WHITE"))) {
+                        game.game().setGameEnded(true);
+                        broadcast(null, gameID, new NotificationMessage("WHITE is in checkmate, Game Over."));
+                    }else if(game.game().isInCheckmate(ChessGame.TeamColor.valueOf("BLACK"))){
+                        game.game().setGameEnded(true);
+                        broadcast(null, gameID, new NotificationMessage("BLACK is in checkmate, Game Over."));
+                    }else {
+                        //If move results in check, send notification message to all clients (including root)
+                        if (game.game().isInCheck(ChessGame.TeamColor.valueOf("WHITE"))) {
+                            broadcast(null, gameID, new NotificationMessage("WHITE is in check"));
+                        } else if (game.game().isInCheck(ChessGame.TeamColor.valueOf("BLACK"))) {
+                            broadcast(null, gameID, new NotificationMessage("BLACK is in check"));
+                        }
+                    }
+                    gDao.updateGame(game,color,name);
                 } catch (InvalidMoveException e) {
                     send(ses, new ErrorMessage("Error: Invalid move"));
                 }
-                //If move results in check, send notification message to all clients (including root)
-                if (game.game().isInCheck(ChessGame.TeamColor.valueOf("WHITE"))) {
-                    broadcast(null, gameID, new NotificationMessage(String.format("%s is in check", color)));
-                }
-                if (game.game().isInCheck(ChessGame.TeamColor.valueOf("BLACK"))) {
-                    broadcast(null, gameID, new NotificationMessage(String.format("%s is in check", color)));
-                }
+
             }
         }
     }

@@ -25,18 +25,18 @@ public class Draw {
         for (int i = 0; i < 8; i++) {
             allRows.add(new ArrayList<>());
         }
-        for(ChessPosition move: moves){
-            switch(move.getRow()){
-                case 1 -> allRows.get(0).add(move.getColumn()-1);
-                case 2 -> allRows.get(1).add(move.getColumn()-1);
-                case 3 -> allRows.get(2).add(move.getColumn()-1);
-                case 4 -> allRows.get(3).add(move.getColumn()-1);
-                case 5 -> allRows.get(4).add(move.getColumn()-1);
-                case 6 -> allRows.get(5).add(move.getColumn()-1);
-                case 7 -> allRows.get(6).add(move.getColumn()-1);
-                case 8 -> allRows.get(7).add(move.getColumn()-1);
+            for (ChessPosition move : moves) {
+                switch (move.getRow()) {
+                    case 1 -> allRows.get(0).add(move.getColumn());
+                    case 2 -> allRows.get(1).add(move.getColumn());
+                    case 3 -> allRows.get(2).add(move.getColumn());
+                    case 4 -> allRows.get(3).add(move.getColumn());
+                    case 5 -> allRows.get(4).add(move.getColumn());
+                    case 6 -> allRows.get(5).add(move.getColumn());
+                    case 7 -> allRows.get(6).add(move.getColumn());
+                    case 8 -> allRows.get(7).add(move.getColumn());
+                }
             }
-        }
         return allRows;
     }
 
@@ -49,39 +49,46 @@ public class Draw {
             printLetters(out, true);
             //draw rows
             for (int row = 8; row > 0; row--) {
-                drawHighlightedRow(out, row, board, allRows.get(row-1));
+                drawHighlightedRow(out, row, board, allRows.get(row-1), color);
             }
             //draw letters at the bottom
             printLetters(out, true);
         }
         else{
-            printLetters(out,true);
+            printLetters(out,false);
             for(int row=1;row<9;row++){
-                drawHighlightedRow(out, row, board, allRows.get(row-1));
+                drawHighlightedRow(out, row, board, allRows.get(row-1), color);
             }
-            printLetters(out,true);
+            printLetters(out,false);
         }
     }
 
-    private static void drawHighlightedRow(PrintStream out, int currentRow, ChessBoard board, ArrayList<Integer> cols){
+    private static void drawHighlightedRow(PrintStream out, int currentRow, ChessBoard board, ArrayList<Integer> cols, String theColor){
         ChessPiece[] theRow = board.getBoard()[currentRow-1];
         //drawing numbers on left
         printNum(out,currentRow);
         //drawing row
-        int squareRow=0;
-        for(ChessPiece piece: theRow){
+        int squareRow;
+        int stop;
+        if(theColor.equalsIgnoreCase("white")){
+            squareRow=1;
+            stop = 9;
+        }
+        else{squareRow=8;
+            stop = 0;}
+        while(squareRow != stop) {
+            ChessPiece piece = theRow[squareRow - 1];
             String color = null;
             String icon = null;
             try {
                 color = setTeamColor(piece);
                 icon = getPieceIcon(color, piece.getPieceType());
                 selectHighSquareType(out, currentRow, squareRow, color, icon, cols);
-                squareRow++;
-            }catch (Exception e) {
-                selectHighSquareType(out,currentRow,squareRow,color,icon,cols);
-                squareRow++;
+                squareRow = updateSquareRow(squareRow, theColor);
+            } catch (Exception e) {
+                selectHighSquareType(out, currentRow, squareRow, color, icon, cols);
+                squareRow = updateSquareRow(squareRow, theColor);
             }
-            //^Can be null if there is no piece on that square (& applies to below)
         }
         //drawing numbers on right
         printNum(out,currentRow);
