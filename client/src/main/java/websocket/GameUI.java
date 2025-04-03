@@ -12,10 +12,13 @@ public class GameUI implements GameHandler{
     //Have game client hold the current board so that redraw in Game client can use it?
     ChessBoard board;
     ChessGame game;
+    boolean gameOver;
+
     public GameUI(){}
 
     public ChessGame getGame(){return game;}
     public ChessBoard getBoard(){return board;}
+    public boolean isGameOver(){return gameOver;}
 
     public void updateGame(ChessBoard game){
         //draws board for the client
@@ -34,6 +37,7 @@ public class GameUI implements GameHandler{
             case LoadGameMessage loadGameMessage -> {
                 game = loadGameMessage.game.game();
                 board = loadGameMessage.game.game().getBoard();
+                gameOver = game.hasGameEnded();
                 updateGame(loadGameMessage.game.game().getBoard());
             }
             case null, default -> {System.out.println(SET_TEXT_COLOR_GREEN + "Couldn't define message type" + RESET_TEXT_COLOR + "\n");}

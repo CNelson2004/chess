@@ -137,8 +137,13 @@ public class GameClient implements EvalClient {
 
     public String resign() throws ResponseException {
         //double checks if user wants to resign
-        confirmResign = true;
-        return "Are you sure you want to resign? (yes/no)\n";
+        if(wsFacade.getGameOver()){
+            wsFacade.resign(token,gameID);
+            return "";
+        } else{
+            confirmResign = true;
+            return "Are you sure you want to resign? (yes/no)\n";
+        }
     }
 
     public String confirmResign() throws ResponseException {

@@ -17,7 +17,6 @@ public class WebsocketFacade extends Endpoint{ //Do I need to implement this?
 
     GameUI gameHandler;
     Session session;
-    ChessGame game;
 
     public WebsocketFacade(String url, GameUI gameHandler) {
         try {
@@ -56,6 +55,7 @@ public class WebsocketFacade extends Endpoint{ //Do I need to implement this?
 
     public ChessBoard getBoard(){return gameHandler.getBoard();}
     public ChessGame getGame(){return gameHandler.getGame();}
+    public boolean getGameOver(){return gameHandler.isGameOver();}
 
     //private sendMessage(){} //unused method
 

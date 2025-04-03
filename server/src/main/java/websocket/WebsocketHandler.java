@@ -52,10 +52,10 @@ public class WebsocketHandler {
                 if(game.blackUsername()!=null){if(game.blackUsername().equals(username)){color = "BLACK";}}
                 if(game.whiteUsername()!=null){if(game.whiteUsername().equals(username)){color = "WHITE";}}
                 switch (command.getCommandType()) {
-                    case CONNECT -> connect(session, username, command.getGameID(), color, gDao);
-                    case MAKE_MOVE -> makeMove(session, gDao, command.getGameID(), username, move, color);
-                    case LEAVE -> leave(session, username, command.getGameID(), gDao, color);
-                    case RESIGN -> resign(session, command.getGameID(), gDao, username, color);
+                    case CONNECT -> connect(session, username, command.getGameID(), color);
+                    case MAKE_MOVE -> makeMove(session, command.getGameID(), username, move, color);
+                    case LEAVE -> leave(session, username, command.getGameID(), color);
+                    case RESIGN -> resign(session, command.getGameID(), username, color);
                     default -> System.out.println("Cannot find command type");
                 }
             }
@@ -69,10 +69,10 @@ public class WebsocketHandler {
         }
     }
 
-    private GameData getGame(GameDao gDao, int gameID) throws DataAccessException {return gDao.getGame(gameID);}
+    private GameData getGame(int gameID) throws DataAccessException {return gDao.getGame(gameID);}
 
-    private void connect(Session ses, String name, int gameID, String color, GameDao gDao) throws IOException, DataAccessException {
-        GameData game = getGame(gDao,gameID);
+    private void connect(Session ses, String name, int gameID, String color) throws IOException, DataAccessException {
+        GameData game = getGame(gameID);
         sessions.add(gameID,ses);
         //send Load Game message to original client
         send(ses,new LoadGameMessage(game));
@@ -83,8 +83,8 @@ public class WebsocketHandler {
         broadcast(ses,gameID,new NotificationMessage(message)); //broadcasts to all but user
     }
 
-    private void makeMove(Session ses, GameDao gDao, int gameID, String name, ChessMove move, String color) throws IOException, DataAccessException {
-        GameData game = getGame(gDao,gameID);
+    private void makeMove(Session ses, int gameID, String name, ChessMove move, String color) throws IOException, DataAccessException {
+        GameData game = getGame(gameID);
         chess.ChessGame.TeamColor theColor = null;
         //check if you are an observer
         if(!Objects.equals(name, game.whiteUsername()) && !Objects.equals(name, game.blackUsername())){
@@ -118,28 +118,31 @@ public class WebsocketHandler {
                     //send notification to all other clients in game
                     String start = convertMove(move.getStartPosition().getRow(),move.getStartPosition().getColumn());
                     String end = convertMove(move.getEndPosition().getRow(),move.getEndPosition().getColumn());
+                    //setCheckmate(game, color, name);
                     broadcast(ses, gameID, new NotificationMessage(String.format("%s has moved from %s to %s", name, start, end)));
-
                     //Checking if anyone is in checkmate, if so, end game
-                    if(game.game().isInCheckmate(ChessGame.TeamColor.valueOf("WHITE"))) {
-                        game.game().setGameEnded(true);
-                        broadcast(null, gameID, new NotificationMessage("WHITE is in checkmate, Game Over."));
-                    }else if(game.game().isInCheckmate(ChessGame.TeamColor.valueOf("BLACK"))){
-                        game.game().setGameEnded(true);
-                        broadcast(null, gameID, new NotificationMessage("BLACK is in checkmate, Game Over."));
-                    }else {
-                        //If move results in check, send notification message to all clients (including root)
-                        if (game.game().isInCheck(ChessGame.TeamColor.valueOf("WHITE"))) {
-                            broadcast(null, gameID, new NotificationMessage("WHITE is in check"));
-                        } else if (game.game().isInCheck(ChessGame.TeamColor.valueOf("BLACK"))) {
-                            broadcast(null, gameID, new NotificationMessage("BLACK is in check"));
-                        }
-                    }
+                    isInCheckOrCheckmate(game,gameID);
                     gDao.updateGame(game,color,name);
                 } catch (InvalidMoveException e) {
                     send(ses, new ErrorMessage("Error: Invalid move"));
                 }
 
+            }
+        }
+    }
+
+    private void isInCheckOrCheckmate(GameData game, int gameID) throws IOException {
+        if(game.game().isInCheckmate(ChessGame.TeamColor.valueOf("WHITE"))) { //checking checkmate
+            game.game().setGameEnded(true);
+            broadcast(null, gameID, new NotificationMessage("WHITE is in checkmate, Game Over."));
+        }else if(game.game().isInCheckmate(ChessGame.TeamColor.valueOf("BLACK"))){
+            game.game().setGameEnded(true);
+            broadcast(null, gameID, new NotificationMessage("BLACK is in checkmate, Game Over."));
+        }else { //Checking if in check otherwise
+            if (game.game().isInCheck(ChessGame.TeamColor.valueOf("WHITE"))) {
+                broadcast(null, gameID, new NotificationMessage("WHITE is in check"));
+            } else if (game.game().isInCheck(ChessGame.TeamColor.valueOf("BLACK"))) {
+                broadcast(null, gameID, new NotificationMessage("BLACK is in check"));
             }
         }
     }
@@ -164,8 +167,8 @@ public class WebsocketHandler {
             }
     }
 
-    private void leave(Session session, String username, int gameID, GameDao gDao, String color) throws IOException, DataAccessException {
-        GameData game = getGame(gDao,gameID);
+    private void leave(Session session, String username, int gameID, String color) throws IOException, DataAccessException {
+        GameData game = getGame(gameID);
         //update game to remove the client
         if(color != null){gDao.updateGame(game,color,null);}
         sessions.remove(session);
@@ -174,10 +177,12 @@ public class WebsocketHandler {
         broadcast(session,gameID,new NotificationMessage(message));
     }
 
-    private void resign(Session ses, int gameID, GameDao gDao, String name, String color) throws IOException, DataAccessException {
-        GameData game = getGame(gDao,gameID);
+    private void resign(Session ses, int gameID, String name, String color) throws IOException, DataAccessException {
+        GameData game = getGame(gameID);
+        //Check if game is over, if so, they cannot resign
+        if(game.game().hasGameEnded()){send(ses, new ErrorMessage("Error: Game Over-Cannot resign"));}
         //Check if session is an observer, if so, they cannot resign
-        if(!Objects.equals(game.blackUsername(), name) && !Objects.equals(game.whiteUsername(), name)){
+        else if(!Objects.equals(game.blackUsername(), name) && !Objects.equals(game.whiteUsername(), name)){
             send(ses, new ErrorMessage("Error: Observer cannot resign")); //Change to notification message?
         }else if (game.game().hasGameEnded()) { //If one person resigned(WHITE), the other person cannot resign(BLACK)
                 send(ses, new ErrorMessage("Error: Opponent already resigned"));}
