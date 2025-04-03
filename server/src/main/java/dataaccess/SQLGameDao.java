@@ -104,7 +104,7 @@ public class SQLGameDao implements GameDao{
         if(color.equals("WHITE")){updatedGame = new GameData(username,game.blackUsername(),game.gameName(),game.gameID(),game.game());}
         //adding updatedGame into the database
         var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, gameID, game) VALUES (?, ?, ?, ?, ?)";
-        var theGame = new Gson().toJson(updatedGame); //updated Game turned into json before being inserted.
+        var theGame = new Gson().toJson(updatedGame.game()); //turns ChessGame in the GameData into Json
         executeUpdate(statement,updatedGame.whiteUsername(),updatedGame.blackUsername(),game.gameName(),game.gameID(),theGame);
         return updatedGame;
     }

@@ -110,9 +110,8 @@ public class WebsocketHandler {
             else {
                 //update game to represent move
                 try {
-                    //In debugging will say it(below) ran into a NullPointerException in GetAllPieces, but it is accounted for
-                    game.game().makeMove(move);
                     //updating game in database
+                    game.game().makeMove(move);
                     gDao.updateGame(game,color,name);
                     //send LoadGame message to all clients in game(including root)
                     broadcast(null, gameID, new LoadGameMessage(game));

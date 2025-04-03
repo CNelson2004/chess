@@ -13,7 +13,7 @@ public class ChessGame {
 
     ChessGame.TeamColor teamTurn;
     ChessBoard board = new ChessBoard();
-    public boolean gameEnded;
+    public boolean gameEnded; //initialized as false
 
     public ChessGame() {
         board.resetBoard();
