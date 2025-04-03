@@ -52,7 +52,7 @@ public class WebsocketHandler {
                 if(game.blackUsername()!=null){if(game.blackUsername().equals(username)){color = "BLACK";}}
                 if(game.whiteUsername()!=null){if(game.whiteUsername().equals(username)){color = "WHITE";}}
                 switch (command.getCommandType()) {
-                    case CONNECT -> connect(session, username, command.getGameID(), color, gDao, aDao);
+                    case CONNECT -> connect(session, username, command.getGameID(), color, gDao);
                     case MAKE_MOVE -> makeMove(session, gDao, command.getGameID(), username, move, color);
                     case LEAVE -> leave(session, username, command.getGameID(), gDao, color);
                     case RESIGN -> resign(session, command.getGameID(), gDao, username);
@@ -69,54 +69,62 @@ public class WebsocketHandler {
         }
     }
 
-    private void connect(Session session, String username, int gameID, String color, GameDao gDao, AuthDao aDao) throws IOException, DataAccessException {
-        sessions.add(gameID,session);
+    private GameData getGame(GameDao gDao, int gameID) throws DataAccessException {return gDao.getGame(gameID);}
+
+    private void connect(Session ses, String name, int gameID, String color, GameDao gDao) throws IOException, DataAccessException {
+        GameData game = getGame(gDao,gameID);
+        sessions.add(gameID,ses);
         //send Load Game message to original client
-        send(session,new LoadGameMessage(gDao.getGame(gameID)));
+        send(ses,new LoadGameMessage(game));
         //send message to rest of clients
         String message;
-        if(color != null){message = String.format("%s has entered the game as %s", username, color);}
-        else{message = String.format("%s has entered the game as an observer", username);}
-        broadcast(session,gameID,new NotificationMessage(message)); //broadcasts to all but user
+        if(color != null){message = String.format("%s has entered the game as %s", name, color);}
+        else{message = String.format("%s has entered the game as an observer", name);}
+        broadcast(ses,gameID,new NotificationMessage(message)); //broadcasts to all but user
     }
 
-    private void makeMove(Session session, GameDao gDao, int gameID, String username, ChessMove move, String color) throws IOException, DataAccessException {
+    private void makeMove(Session ses, GameDao gDao, int gameID, String name, ChessMove move, String color) throws IOException, DataAccessException {
+        GameData game = getGame(gDao,gameID);
         chess.ChessGame.TeamColor theColor = null;
         //check if you are an observer
-        if(!Objects.equals(username, gDao.getGame(gameID).whiteUsername()) && !Objects.equals(username, gDao.getGame(gameID).blackUsername())){
-            send(session, new ErrorMessage("Error: You are an observer, you cannot move pieces"));}
+        if(!Objects.equals(name, game.whiteUsername()) && !Objects.equals(name, game.blackUsername())){
+            send(ses, new ErrorMessage("Error: You are an observer, you cannot move pieces"));}
         //If came is complete, then no more moves can be made
-        else if(gDao.getGame(gameID).game().hasGameEnded()){send(session, new ErrorMessage("Error: Game Over-No More Moves"));}
-        else if(move==null){send(session, new ErrorMessage("Error:Null move"));} //verify validity of move
+        else if(game.game().hasGameEnded()){send(ses, new ErrorMessage("Error: Game Over-No More Moves"));}
+        else if(move==null){send(ses, new ErrorMessage("Error:Null move"));} //verify validity of move
         else {
             if (color.equalsIgnoreCase("white")) {
                 theColor = chess.ChessGame.TeamColor.WHITE;
             } else{theColor = chess.ChessGame.TeamColor.BLACK;}
             //Checking if game is in checkmate or stalemate, and if so, make it complete
-            if(gDao.getGame(gameID).game().isInCheckmate(theColor)||gDao.getGame(gameID).game().isInStalemate(theColor)){
-                gDao.getGame(gameID).game().setGameEnded(true);
-                send(session, new ErrorMessage("Error: Game Over-No More Moves"));
+            if(game.game().isInCheckmate(theColor)||game.game().isInStalemate(theColor)){
+                game.game().setGameEnded(true);
+                send(ses, new ErrorMessage("Error: Game Over-No More Moves"));
             }
             //Check move turn
-            else if(theColor != gDao.getGame(gameID).game().getTeamTurn()){send(session, new ErrorMessage("Error: Not your turn"));}
+            else if(theColor != game.game().getTeamTurn()){send(ses, new ErrorMessage("Error: Not your turn"));}
             //Check if you are moving your piece
-            else if(theColor != gDao.getGame(gameID).game().getBoard().getPiece(move.getStartPosition()).getTeamColor()){
-                send(session, new ErrorMessage("Error: Not your piece"));
+            else if(theColor != game.game().getBoard().getPiece(move.getStartPosition()).getTeamColor()){
+                send(ses, new ErrorMessage("Error: Not your piece"));
             }
             else {
                 //update game to represent move
                 try {
                     //In debugging will say it(below) ran into a NullPointerException in GetAllPieces, but it is accounted for
-                    gDao.getGame(gameID).game().makeMove(move);
+                    game.game().makeMove(move);
+                    //updating game in database
+                    gDao.updateGame(game,color,name);
                     //send LoadGame message to all clients in game(including root)
-                    broadcast(null, gameID, new LoadGameMessage(gDao.getGame(gameID)));
+                    broadcast(null, gameID, new LoadGameMessage(game));
                     //send notification to all other clients in game
-                    broadcast(session, gameID, new NotificationMessage(String.format("%s has moved from %s to %s", username, move.getStartPosition().toString(), move.getEndPosition().toString())));
+                    String start = move.getStartPosition().toString();
+                    String end = move.getEndPosition().toString();
+                    broadcast(ses, gameID, new NotificationMessage(String.format("%s has moved from %s to %s", name, start, end)));
                 } catch (InvalidMoveException e) {
-                    send(session, new ErrorMessage("Error: Invalid move"));
+                    send(ses, new ErrorMessage("Error: Invalid move"));
                 }
                 //If move results in check, send notification message to all clients (including root)
-                if (gDao.getGame(gameID).game().isInCheck(ChessGame.TeamColor.valueOf(color))) {
+                if (game.game().isInCheck(ChessGame.TeamColor.valueOf(color))) {
                     broadcast(null, gameID, new NotificationMessage(String.format("%s is in check", color)));
                 }
             }
@@ -124,8 +132,9 @@ public class WebsocketHandler {
     }
 
     private void leave(Session session, String username, int gameID, GameDao gDao, String color) throws IOException, DataAccessException {
+        GameData game = getGame(gDao,gameID);
         //update game to remove the client
-        if(color != null){gDao.updateGame(gDao.getGame(gameID),color,null);}
+        if(color != null){gDao.updateGame(game,color,null);}
         sessions.remove(session);
         //Tell other clients that original client left
         String message = String.format("%s has left the game",username);
@@ -133,14 +142,15 @@ public class WebsocketHandler {
     }
 
     private void resign(Session session, int gameID, GameDao gDao, String username) throws IOException, DataAccessException {
+        GameData game = getGame(gDao,gameID);
         //Check if session is an observer, if so, they cannot resign
-        if(!Objects.equals(gDao.getGame(gameID).blackUsername(), username) && !Objects.equals(gDao.getGame(gameID).whiteUsername(), username)){
+        if(!Objects.equals(game.blackUsername(), username) && !Objects.equals(game.whiteUsername(), username)){
             send(session, new ErrorMessage("Error: Observer cannot resign")); //Change to notification message?
-        }else if (gDao.getGame(gameID).game().hasGameEnded()) { //If one person resigned(WHITE), the other person cannot resign(BLACK)
+        }else if (game.game().hasGameEnded()) { //If one person resigned(WHITE), the other person cannot resign(BLACK)
                 send(session, new ErrorMessage("Error: Opponent already resigned"));}
         else{
             //mark the game as over (no more moves can be made)
-            gDao.getGame(gameID).game().setGameEnded(true);
+            game.game().setGameEnded(true);
             //Tell all clients original client has resigned
             String message = String.format("%s has resigned", username);
             broadcast(null, gameID, new NotificationMessage(message));

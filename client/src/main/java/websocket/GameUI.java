@@ -25,8 +25,12 @@ public class GameUI implements GameHandler{
 
     public void printMessage(ServerMessage message){
         switch (message) {
-            case NotificationMessage notificationMessage -> {System.out.println(SET_TEXT_COLOR_BLUE + notificationMessage.message + RESET_TEXT_COLOR + "\n");}
-            case ErrorMessage errorMessage -> {System.out.println(SET_TEXT_COLOR_RED + errorMessage.errorMessage + RESET_TEXT_COLOR + "\n");}
+            case NotificationMessage notificationMessage -> {
+                System.out.println(SET_TEXT_COLOR_BLUE + notificationMessage.message + RESET_TEXT_COLOR + "\n");
+            }
+            case ErrorMessage errorMessage -> {
+                System.out.println(SET_TEXT_COLOR_RED + errorMessage.errorMessage + RESET_TEXT_COLOR + "\n");
+            }
             case LoadGameMessage loadGameMessage -> {
                 game = loadGameMessage.game.game();
                 board = loadGameMessage.game.game().getBoard();

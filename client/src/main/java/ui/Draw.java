@@ -21,7 +21,10 @@ public class Draw {
     }
 
     public static ArrayList<ArrayList<Integer>> createRowHolder(Collection<ChessPosition> moves){
-        ArrayList<ArrayList<Integer>> allRows = new ArrayList<>(Arrays.asList(new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>()));
+        ArrayList<ArrayList<Integer>> allRows = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            allRows.add(new ArrayList<>());
+        }
         for(ChessPosition move: moves){
             switch(move.getRow()){
                 case 1 -> allRows.get(0).add(move.getColumn()-1);
@@ -69,12 +72,16 @@ public class Draw {
         for(ChessPiece piece: theRow){
             String color = null;
             String icon = null;
-            try {color = setTeamColor(piece);
-                icon = getPieceIcon(color,piece.getPieceType());}
-            catch (Exception e) {continue;}
+            try {
+                color = setTeamColor(piece);
+                icon = getPieceIcon(color, piece.getPieceType());
+                selectHighSquareType(out, currentRow, squareRow, color, icon, cols);
+                squareRow++;
+            }catch (Exception e) {
+                selectHighSquareType(out,currentRow,squareRow,color,icon,cols);
+                squareRow++;
+            }
             //^Can be null if there is no piece on that square (& applies to below)
-            selectHighlightedSquareType(out,currentRow,squareRow,color,icon,cols);
-            squareRow++;
         }
         //drawing numbers on right
         printNum(out,currentRow);
@@ -82,7 +89,7 @@ public class Draw {
         out.println();
     }
 
-    private static void selectHighlightedSquareType(PrintStream out, int currentRow, int squareRow, String color, String icon, ArrayList<Integer> cols){
+    private static void selectHighSquareType(PrintStream out, int currentRow, int squareRow, String color, String icon, ArrayList<Integer> cols){
         boolean isHighlighted = cols.contains(squareRow);
         if(icon!=null){
             highlightedSquareHelper(out,isHighlighted,currentRow,color,squareRow,icon);
@@ -202,12 +209,16 @@ public class Draw {
         for(ChessPiece piece: theRow){
             String color = null;
             String icon = null;
-            try {color = setTeamColor(piece);
-                icon = getPieceIcon(color,piece.getPieceType());}
-            catch (Exception e) {continue;}
+            try {
+                color = setTeamColor(piece);
+                icon = getPieceIcon(color, piece.getPieceType());
+                selectSquareType(out, currentRow, squareRow, color, icon);
+                squareRow++;
+            }catch (Exception e) {
+                selectSquareType(out,currentRow,squareRow,color,icon);
+                squareRow++;
+            }
             //^Can be null if there is no piece on that square (& applies to below)
-            selectSquareType(out,currentRow,squareRow,color,icon);
-            squareRow++;
         }
         //drawing numbers on right
         printNum(out,currentRow);
@@ -323,78 +334,4 @@ public class Draw {
         out.print(RESET_BG_COLOR);
         out.print(RESET_TEXT_COLOR);
     }
-
-
-    //Static starting board
-    public static void drawBoard(){
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        out.print(ERASE_SCREEN);
-        drawChessBoard(out);
-        reset(out);
-    }
-
-    public static void drawBoardBlack(){
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        out.print(ERASE_SCREEN);
-        drawChessBoardBackwards(out);
-        reset(out);
-    }
-
-    private static void drawChessBoard(PrintStream out){
-        //draw letters at the top
-        printLetters(out,true);
-        //draw rows
-        for(int row=8;row>0;row--){
-            drawRow(out, row);
-        }
-        //draw letters at the bottom
-        printLetters(out,true);
-    }
-
-    private static void drawChessBoardBackwards(PrintStream out){
-        //draw letters at the top
-        printLetters(out,false);
-        //draw rows
-        for(int row=1;row<9;row++){
-            drawRow(out, row);
-        }
-        //draw letters at the bottom
-        printLetters(out,false);
-    }
-
-    private static void drawRow(PrintStream out, int currentRow){
-        String[] lineup = new String[]{};
-        String color = "";
-        if(currentRow==1){lineup = new String[]{WHITE_ROOK,WHITE_KNIGHT,WHITE_BISHOP,WHITE_QUEEN,WHITE_KING,WHITE_BISHOP,WHITE_KNIGHT,WHITE_ROOK};
-            color = "white";}
-        if(currentRow==2){lineup = new String[]{WHITE_PAWN,WHITE_PAWN,WHITE_PAWN,WHITE_PAWN,WHITE_PAWN,WHITE_PAWN,WHITE_PAWN,WHITE_PAWN};
-            color = "white";}
-        if(currentRow==7){lineup = new String[]{BLACK_PAWN,BLACK_PAWN,BLACK_PAWN,BLACK_PAWN,BLACK_PAWN,BLACK_PAWN,BLACK_PAWN,BLACK_PAWN};
-            color = "black";}
-        if(currentRow==8){lineup = new String[]{BLACK_ROOK,BLACK_KNIGHT,BLACK_BISHOP,BLACK_QUEEN,BLACK_KING,BLACK_BISHOP,BLACK_KNIGHT,BLACK_ROOK};
-            color = "black";}
-
-        //drawing numbers on left
-        printNum(out,currentRow);
-        for(int squareRow=0;squareRow<8;squareRow++){
-            //drawing row
-            if(currentRow==1||currentRow==7){
-                if(squareRow%2==0){drawSquare(out,"black",color,lineup[squareRow]);}
-                else{drawSquare(out,"white",color,lineup[squareRow]);}
-            }
-            else if(currentRow==2||currentRow==8){
-                if(squareRow%2==0){drawSquare(out,"white",color,lineup[squareRow]);}
-                else{drawSquare(out,"black",color,lineup[squareRow]);}
-            }
-            else{ //current row is even with no pieces
-                drawNormalEmptySquare(out,currentRow,squareRow);
-            }
-
-        }
-        //drawing numbers on right
-        printNum(out,currentRow);
-        setBlack(out);
-        out.println();
-    }
-
 }

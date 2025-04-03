@@ -43,9 +43,12 @@ public class WebsocketFacade extends Endpoint{ //Do I need to implement this?
         public void onMessage(String message) {
             ServerMessage mes = new Gson().fromJson(message, ServerMessage.class);
             //Checking specifically which subclass it is
-            if(mes.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){mes = new Gson().fromJson(message, NotificationMessage.class);}
-            else if(mes.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){mes = new Gson().fromJson(message, ErrorMessage.class);}
-            else if (mes.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {mes = new Gson().fromJson(message, LoadGameMessage.class);}
+            if(mes.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
+                mes = new Gson().fromJson(message, NotificationMessage.class);}
+            else if(mes.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+                mes = new Gson().fromJson(message, ErrorMessage.class);}
+            else if (mes.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                mes = new Gson().fromJson(message, LoadGameMessage.class);}
             //call gameHandler to process message
             gameHandler.printMessage(mes);
         }
